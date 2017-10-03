@@ -59,13 +59,13 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MyViewHold
         return movieList.size();
     }
 
-    public class MyViewHolder extends RecyclerView.ViewHolder {
+    class MyViewHolder extends RecyclerView.ViewHolder {
 
-        public TextView title;
-        public TextView userRating;
-        public ImageView thumbnail;
+        TextView title;
+        TextView userRating;
+        ImageView thumbnail;
 
-        public MyViewHolder(View itemView) {
+        MyViewHolder(View itemView) {
             super(itemView);
             title = (TextView) itemView.findViewById(R.id.title);
             userRating = (TextView) itemView.findViewById(R.id.user_rating);

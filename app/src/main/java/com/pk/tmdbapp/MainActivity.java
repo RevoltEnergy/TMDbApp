@@ -4,7 +4,9 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.ContextWrapper;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -31,7 +33,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     private RecyclerView recyclerView;
     private MoviesAdapter adapter;
@@ -79,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
         adapter.notifyDataSetChanged();
 
-        loadJSON();
+        checkSortOrder();
     }
 
     public Activity getActivity() {
@@ -93,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
         return null;
     }
 
-    private void loadJSON() {
+    private void loadPopularMoviesJSON() {
         try {
             if (BuildConfig.TMDB_API_KEY.isEmpty()) {
                 Toast.makeText(getApplicationContext(), "Please obtain API Key from themoviedb.com",
@@ -102,9 +104,43 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
 
-            Client client = new Client();
             Service apiService = Client.getClient().create(Service.class);
             Call<MoviesResponse> call = apiService.getPopularMovies(BuildConfig.TMDB_API_KEY);
+            call.enqueue(new Callback<MoviesResponse>() {
+                @Override
+                public void onResponse(@NonNull Call<MoviesResponse> call, @NonNull Response<MoviesResponse> response) {
+                    List<Movie> movies = response.body().getResults();
+                    recyclerView.setAdapter(new MoviesAdapter(getApplicationContext(), movies));
+                    recyclerView.smoothScrollToPosition(0);
+                    if (swipeContainer.isRefreshing()) {
+                        swipeContainer.setRefreshing(false);
+                    }
+                    progressDialog.dismiss();
+                }
+
+                @Override
+                public void onFailure(@NonNull Call<MoviesResponse> call, @NonNull Throwable t) {
+                    Log.d("Error", t.getMessage());
+                    Toast.makeText(MainActivity.this, "Error Fetching Data", Toast.LENGTH_SHORT).show();
+                }
+            });
+        } catch (Exception e) {
+            Log.d("Error", e.getMessage());
+            Toast.makeText(this, e.toString(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void loadTopRatedMoviesJSON() {
+        try {
+            if (BuildConfig.TMDB_API_KEY.isEmpty()) {
+                Toast.makeText(getApplicationContext(), "Please obtain API Key from themoviedb.com",
+                        Toast.LENGTH_SHORT).show();
+                progressDialog.dismiss();
+                return;
+            }
+
+            Service apiService = Client.getClient().create(Service.class);
+            Call<MoviesResponse> call = apiService.getTopRatedMovies(BuildConfig.TMDB_API_KEY);
             call.enqueue(new Callback<MoviesResponse>() {
                 @Override
                 public void onResponse(@NonNull Call<MoviesResponse> call, @NonNull Response<MoviesResponse> response) {
@@ -142,6 +178,35 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        Log.d(LOG_TAG, "Preferences updated");
+        checkSortOrder();
+    }
+
+    private void checkSortOrder() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String sortOrder = preferences.getString(
+                this.getString(R.string.pref_sort_order_key),
+                this.getString(R.string.pref_most_popular)
+        );
+        if (sortOrder.equals(this.getString(R.string.pref_most_popular))) {
+            Log.d(LOG_TAG, "Sorting by most popular");
+            loadPopularMoviesJSON();
+        } else {
+            Log.d(LOG_TAG, "Sorting by top rated");
+            loadTopRatedMoviesJSON();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (movieList.isEmpty()) {
+            checkSortOrder();
         }
     }
 }

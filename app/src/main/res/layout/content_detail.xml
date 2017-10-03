@@ -11,97 +11,93 @@
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        tools:showIn="@layout/activity_detail">
 
-        <RelativeLayout
+        <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_height="wrap_content">
 
             <TextView
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:id="@+id/movie_title"
-                android:gravity="center"
-                android:layout_marginTop="10dp"
-                android:textSize="25sp"
-                android:textStyle="bold"
-                android:text="@string/name_movie"/>
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
                 android:id="@+id/title"
-                android:gravity="center"
                 android:padding="@dimen/padding_layout"
                 android:layout_marginTop="@dimen/layout_margin_top"
                 android:textSize="20sp"
-                android:layout_below="@+id/movie_title"/>
+                android:textAlignment="center"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintTop_creator ="1"
+                app:layout_constraintLeft_creator ="1"
+                />
 
             <TextView
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:id="@+id/plot"
-                android:gravity="center"
-                android:layout_marginTop="@dimen/layout_margin_top2"
-                android:textSize="25sp"
-                android:textStyle="bold"
-                android:text="@string/plot"
-                android:layout_below="@+id/title"/>
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/plot_synopsis"
-                android:gravity="center"
-                android:padding="@dimen/padding_layout"
-                android:layout_marginTop="@dimen/layout_margin_top"
-                android:textSize="20sp"
-                android:layout_below="@+id/plot"/>
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/rating"
-                android:gravity="center"
-                android:layout_marginTop="@dimen/layout_margin_top2"
-                android:textSize="25sp"
-                android:textStyle="bold"
-                android:text="@string/rating"
-                android:layout_below="@+id/plot_synopsis"/>
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
                 android:id="@+id/user_rating"
-                android:gravity="center"
                 android:padding="@dimen/padding_layout"
                 android:layout_marginTop="@dimen/layout_margin_top"
                 android:textSize="20sp"
-                android:layout_below="@+id/rating"/>
+                app:layout_constraintTop_toBottomOf="@+id/title"
+                tools:layout_constraintTop_creator="1" />
 
             <TextView
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:id="@+id/release"
-                android:gravity="center"
-                android:layout_marginTop="@dimen/layout_margin_top2"
-                android:textSize="25sp"
-                android:textStyle="bold"
-                android:text="@string/release"
-                android:layout_below="@+id/user_rating"/>
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
                 android:id="@+id/release_date"
-                android:gravity="center"
                 android:padding="@dimen/padding_layout"
                 android:layout_marginTop="@dimen/layout_margin_top"
                 android:textSize="20sp"
-                android:layout_below="@+id/release"/>
+                app:layout_constraintTop_toBottomOf="@+id/user_rating"/>
 
-        </RelativeLayout>
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
+                android:id="@+id/plot_synopsis"
+                android:padding="@dimen/padding_layout"
+                android:textSize="20sp"
+                app:layout_constraintTop_toBottomOf="@+id/release_date"/>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
+                android:id="@+id/thumbnailUrl"
+                app:layout_constraintTop_toBottomOf="@+id/plot_synopsis"
+                app:layout_constraintLeft_toLeftOf="parent"
+                android:visibility="invisible"/>
+
+            <com.github.ivbaranov.mfb.MaterialFavoriteButton
+                android:id="@+id/favorite_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="5dp"
+                app:layout_constraintRight_toRightOf="@+id/release_date"
+                app:layout_constraintTop_toBottomOf="@+id/user_rating"
+                app:layout_constraintBottom_toTopOf="@+id/user_rating"
+                android:background="@color/colorPrimary"/>
+
+        </android.support.constraint.ConstraintLayout>
 
     </ScrollView>
 

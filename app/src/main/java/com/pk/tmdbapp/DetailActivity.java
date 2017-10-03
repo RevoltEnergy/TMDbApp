@@ -1,10 +1,13 @@
 package com.pk.tmdbapp;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.widget.ImageView;
@@ -13,6 +16,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.github.ivbaranov.mfb.MaterialFavoriteButton;
 
 /**
  * Created by ace on 10/02/2017.
@@ -65,6 +69,33 @@ public class DetailActivity extends AppCompatActivity {
         } else {
             Toast.makeText(this, "No API Data", Toast.LENGTH_SHORT).show();
         }
+
+        MaterialFavoriteButton materialFavoriteButton =
+                (MaterialFavoriteButton) findViewById(R.id.favorite_button);
+
+        SharedPreferences sharedPreferences =
+                PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+
+        materialFavoriteButton.setOnFavoriteChangeListener(new MaterialFavoriteButton.OnFavoriteChangeListener() {
+            SharedPreferences.Editor editor =
+                    getSharedPreferences("com.pk.tmdbapp.DetailActivity", MODE_PRIVATE).edit();
+            @Override
+            public void onFavoriteChanged(MaterialFavoriteButton buttonView, boolean favorite) {
+
+                if (favorite) {
+                    editor.putBoolean("Favorite Added", true);
+                    editor.apply();
+                    //saveFavorite();
+                    Snackbar.make(buttonView, "Added to Favorite", Snackbar.LENGTH_SHORT).show();
+                } else {
+                    editor.putBoolean("Favorite Removed", true);
+                    editor.apply();
+                    //removeFavorite();
+                    Snackbar.make(buttonView, "Removed from Favorite", Snackbar.LENGTH_SHORT).show();
+                }
+            }
+        });
+
     }
 
     private void initCollapsingToolbar() {

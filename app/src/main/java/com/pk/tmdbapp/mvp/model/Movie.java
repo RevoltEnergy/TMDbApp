@@ -1,4 +1,4 @@
-package com.pk.tmdbapp.model;
+package com.pk.tmdbapp.mvp.model;
 
 import com.google.gson.annotations.SerializedName;
 

@@ -1,9 +1,11 @@
-package com.pk.tmdbapp;
+package com.pk.tmdbapp.activities;
 
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.support.annotation.Nullable;
+
+import com.pk.tmdbapp.R;
 
 /**
  * Created by ace on 10/02/2017.

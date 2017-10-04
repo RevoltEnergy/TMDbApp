@@ -1,7 +1,4 @@
-package com.pk.tmdbapp.model;
-
-import android.os.Parcel;
-import android.os.Parcelable;
+package com.pk.tmdbapp.mvp.model;
 
 import com.google.gson.annotations.SerializedName;
 

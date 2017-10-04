@@ -1,4 +1,4 @@
-package com.pk.tmdbapp;
+package com.pk.tmdbapp.activities;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -17,6 +17,11 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.github.ivbaranov.mfb.MaterialFavoriteButton;
+import com.pk.tmdbapp.R;
+import com.pk.tmdbapp.db.DBService;
+import com.pk.tmdbapp.db.models.MovieModel;
+
+import io.realm.Realm;
 
 /**
  * Created by ace on 10/02/2017.
@@ -41,6 +46,12 @@ public class DetailActivity extends AppCompatActivity {
 
         initCollapsingToolbar();
 
+        Realm.init(this);
+
+        DBService dbService = new DBService();
+
+        MovieModel movieModel = new MovieModel();
+
         imageView = (ImageView) findViewById(R.id.thumbnail_image_header);
         nameOfMovie = (TextView) findViewById(R.id.title);
         plotSynopsis = (TextView) findViewById(R.id.plot_synopsis);
@@ -54,6 +65,11 @@ public class DetailActivity extends AppCompatActivity {
             String synopsis = getIntent().getExtras().getString("overview");
             String rating = getIntent().getExtras().getString("vote_average");
             String dateOfRelease = getIntent().getExtras().getString("release_date");
+
+            movieModel.setTitle(getIntent().getExtras().getString("original_title"));
+            movieModel.setUserRating(rating);
+            movieModel.setPosterPath(thumbnail);
+            movieModel.setOverview(synopsis);
 
             Glide.with(this)
                     .load(thumbnail)
@@ -78,24 +94,34 @@ public class DetailActivity extends AppCompatActivity {
 
         materialFavoriteButton.setOnFavoriteChangeListener(new MaterialFavoriteButton.OnFavoriteChangeListener() {
             SharedPreferences.Editor editor =
-                    getSharedPreferences("com.pk.tmdbapp.DetailActivity", MODE_PRIVATE).edit();
+                    getSharedPreferences("com.pk.tmdbapp.activities.DetailActivity", MODE_PRIVATE).edit();
             @Override
             public void onFavoriteChanged(MaterialFavoriteButton buttonView, boolean favorite) {
 
                 if (favorite) {
                     editor.putBoolean("Favorite Added", true);
                     editor.apply();
-                    //saveFavorite();
+                    saveFavorite(dbService, movieModel);
                     Snackbar.make(buttonView, "Added to Favorite", Snackbar.LENGTH_SHORT).show();
                 } else {
                     editor.putBoolean("Favorite Removed", true);
                     editor.apply();
-                    //removeFavorite();
+                    removeFavorite(dbService, movieModel);
                     Snackbar.make(buttonView, "Removed from Favorite", Snackbar.LENGTH_SHORT).show();
                 }
             }
         });
 
+    }
+
+    private void removeFavorite(DBService dbService, MovieModel movieModel) {
+        dbService.remove(movieModel, MovieModel.class)
+                .subscribe(movieModel1 -> Toast.makeText(getBaseContext(), "Saved", Toast.LENGTH_SHORT).show());
+    }
+
+    private void saveFavorite(DBService dbService, MovieModel movieModel) {
+        dbService.save(movieModel, MovieModel.class)
+        .subscribe(movieModel1 -> Toast.makeText(getBaseContext(), "Saved", Toast.LENGTH_SHORT).show());
     }
 
     private void initCollapsingToolbar() {

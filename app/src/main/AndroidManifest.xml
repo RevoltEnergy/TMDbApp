@@ -10,7 +10,8 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme"
+        android:name="com.pk.tmdbapp.application.TMDbApplication">
         <activity android:name="com.pk.tmdbapp.MainActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -19,7 +20,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.pk.tmdbapp.DetailActivity"
+            android:name="com.pk.tmdbapp.activities.DetailActivity"
             android:label="Movies"
             android:theme="@style/AppTheme.NoActionBar"
             android:parentActivityName="com.pk.tmdbapp.MainActivity">
@@ -28,7 +29,7 @@
                 android:value="com.pk.tmdbapp.MainActivity"/>
         </activity>
         <activity
-            android:name="com.pk.tmdbapp.SettingsActivity"
+            android:name="com.pk.tmdbapp.activities.SettingsActivity"
             android:label="Settings">
         </activity>
     </application>

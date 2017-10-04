@@ -21,18 +21,25 @@ import android.widget.Toast;
 
 import com.pk.tmdbapp.adapter.MoviesAdapter;
 import com.pk.tmdbapp.api.Client;
-import com.pk.tmdbapp.api.Service;
-import com.pk.tmdbapp.model.Movie;
-import com.pk.tmdbapp.model.MoviesResponse;
+import com.pk.tmdbapp.api.MovieAPIService;
+import com.pk.tmdbapp.mvp.model.Movie;
+import com.pk.tmdbapp.mvp.model.MoviesResponse;
+import com.pk.tmdbapp.mvp.presenter.MoviePresenter;
+import com.pk.tmdbapp.mvp.view.MainView;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.inject.Inject;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
+public class MainActivity extends AppCompatActivity
+        implements SharedPreferences.OnSharedPreferenceChangeListener, MainView {
+
+    @Inject protected MoviePresenter moviePresenter;
 
     private RecyclerView recyclerView;
     private MoviesAdapter adapter;
@@ -103,8 +110,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 return;
             }
 
-            Service apiService = Client.getClient().create(Service.class);
-            Call<MoviesResponse> call = apiService.getPopularMovies(BuildConfig.TMDB_API_KEY);
+            MovieAPIService apiMovieService = Client.getClient().create(MovieAPIService.class);
+            Call<MoviesResponse> call = apiMovieService.getPopularMovies(BuildConfig.TMDB_API_KEY);
             call.enqueue(new Callback<MoviesResponse>() {
                 @Override
                 public void onResponse(@NonNull Call<MoviesResponse> call, @NonNull Response<MoviesResponse> response) {
@@ -138,8 +145,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 return;
             }
 
-            Service apiService = Client.getClient().create(Service.class);
-            Call<MoviesResponse> call = apiService.getTopRatedMovies(BuildConfig.TMDB_API_KEY);
+            MovieAPIService apiMovieService = Client.getClient().create(MovieAPIService.class);
+            Call<MoviesResponse> call = apiMovieService.getTopRatedMovies(BuildConfig.TMDB_API_KEY);
             call.enqueue(new Callback<MoviesResponse>() {
                 @Override
                 public void onResponse(@NonNull Call<MoviesResponse> call, @NonNull Response<MoviesResponse> response) {

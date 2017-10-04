@@ -12,10 +12,9 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
-import com.pk.tmdbapp.DetailActivity;
-import com.pk.tmdbapp.MainActivity;
+import com.pk.tmdbapp.activities.DetailActivity;
 import com.pk.tmdbapp.R;
-import com.pk.tmdbapp.model.Movie;
+import com.pk.tmdbapp.mvp.model.Movie;
 
 import java.util.List;
 

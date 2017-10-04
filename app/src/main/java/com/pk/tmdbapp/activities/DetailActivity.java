@@ -121,7 +121,7 @@ public class DetailActivity extends AppCompatActivity {
 
     private void saveFavorite(DBService dbService, MovieModel movieModel) {
         dbService.save(movieModel, MovieModel.class)
-        .subscribe(movieModel1 -> Toast.makeText(getBaseContext(), "Saved", Toast.LENGTH_SHORT).show());
+        .subscribe(movieModel1 -> Toast.makeText(getBaseContext(), "Removed", Toast.LENGTH_SHORT).show());
     }
 
     private void initCollapsingToolbar() {

@@ -5,6 +5,7 @@ import android.content.Context;
 import com.pk.tmdbapp.application.TMDbApplication;
 import com.pk.tmdbapp.di.module.ApplicationModule;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import dagger.Component;
@@ -18,9 +19,9 @@ import retrofit2.Retrofit;
 @Component(modules = ApplicationModule.class)
 public interface ApplicationComponent {
 
-    Retrofit exposeRetrofit();
+    //@Inject Retrofit exposeRetrofit();
 
-    Context exposeContext();
+    //@Inject Context exposeContext();
 
     //void inject(TMDbApplication application);
 }

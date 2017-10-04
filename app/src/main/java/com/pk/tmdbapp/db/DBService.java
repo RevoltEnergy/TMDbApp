@@ -40,13 +40,18 @@ public class DBService {
 
         return Observable.just(object)
                 .flatMap(t -> Observable.just(t)
+                        .doOnSubscribe(lol -> realm.executeTransaction(realm1 -> realm1.copyToRealmOrUpdate(object)))
+                );
+
+        /*return Observable.just(object)
+                .flatMap(t -> Observable.just(t)
                         .doOnSubscribe(lol -> {
                             realm.beginTransaction();
                             realm.commitTransaction();
                             realm.close();
                         })
                         .doOnNext(realm::copyToRealm)
-                );
+                );*/
     }
 
     public <T extends RealmObject> Observable<T> remove(T object, Class<T> clazz) {

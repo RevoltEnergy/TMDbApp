@@ -1,6 +1,7 @@
 package com.pk.tmdbapp;
 
 import android.app.Activity;
+import android.app.Application;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.ContextWrapper;
@@ -24,10 +25,11 @@ import com.pk.tmdbapp.activities.SettingsActivity;
 import com.pk.tmdbapp.adapter.MoviesAdapter;
 import com.pk.tmdbapp.api.Client;
 import com.pk.tmdbapp.api.MovieAPIService;
+import com.pk.tmdbapp.application.TMDbApplication;
 import com.pk.tmdbapp.db.DBService;
-import com.pk.tmdbapp.mvp.model.Movie;
+import com.pk.tmdbapp.di.module.ApplicationModule;
+import com.pk.tmdbapp.mvp.model.MovieModel;
 import com.pk.tmdbapp.mvp.model.MoviesResponse;
-import com.pk.tmdbapp.mvp.presenter.MoviePresenter;
 import com.pk.tmdbapp.mvp.view.MainView;
 
 import java.util.ArrayList;
@@ -43,11 +45,11 @@ import retrofit2.Response;
 public class MainActivity extends AppCompatActivity
         implements SharedPreferences.OnSharedPreferenceChangeListener, MainView {
 
-    @Inject protected MoviePresenter moviePresenter;
+    @Inject protected Realm mRealm;
 
     private RecyclerView recyclerView;
     private MoviesAdapter adapter;
-    private List<Movie> movieList;
+    private List<MovieModel> movieList;
     ProgressDialog progressDialog;
     private SwipeRefreshLayout swipeContainer;
     public static final String LOG_TAG = MoviesAdapter.class.getName();
@@ -55,7 +57,12 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ((TMDbApplication) getApplication()).getAppComponent().inject(this);
         setContentView(R.layout.activity_main);
+
+        System.out.println("###########################################################################################");
+        if (mRealm == null) System.out.println("realm null MA");
+        System.out.println("###########################################################################################");
 
         initViews();
     }
@@ -92,8 +99,27 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void loadFavoriteMovies() {
+
+        //Realm.init(this);
+
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         movieList = new ArrayList<>();
+
+        DBService dbService = new DBService();
+
+        movieList.clear();
+
+        dbService.getAll(MovieModel.class).subscribe(movieModels -> movieList.addAll(movieModels));
+
+        if (movieList.isEmpty()) {
+            Toast.makeText(MainActivity.this, "You have no favorite movie added", Toast.LENGTH_SHORT).show();
+            loadPopularMoviesJSON();
+            /*SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.remove(this.getString(R.string.favorite));
+            editor.apply();*/
+        }
+
         adapter = new MoviesAdapter(this, movieList);
 
         if (getActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
@@ -102,16 +128,11 @@ public class MainActivity extends AppCompatActivity
             recyclerView.setLayoutManager(new GridLayoutManager(this, 4));
         }
 
+        progressDialog.dismiss();
+
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(adapter);
         adapter.notifyDataSetChanged();
-
-        Realm.init(this);
-
-        DBService dbService = new DBService();
-
-        movieList.clear();
-        //movieList.addAll();
     }
 
     private void loadPopularMoviesJSON() {
@@ -128,7 +149,7 @@ public class MainActivity extends AppCompatActivity
             call.enqueue(new Callback<MoviesResponse>() {
                 @Override
                 public void onResponse(@NonNull Call<MoviesResponse> call, @NonNull Response<MoviesResponse> response) {
-                    List<Movie> movies = response.body().getResults();
+                    List<MovieModel> movies = response.body().getResults();
                     recyclerView.setAdapter(new MoviesAdapter(getApplicationContext(), movies));
                     recyclerView.smoothScrollToPosition(0);
                     if (swipeContainer.isRefreshing()) {
@@ -163,7 +184,7 @@ public class MainActivity extends AppCompatActivity
             call.enqueue(new Callback<MoviesResponse>() {
                 @Override
                 public void onResponse(@NonNull Call<MoviesResponse> call, @NonNull Response<MoviesResponse> response) {
-                    List<Movie> movies = response.body().getResults();
+                    List<MovieModel> movies = response.body().getResults();
                     recyclerView.setAdapter(new MoviesAdapter(getApplicationContext(), movies));
                     recyclerView.smoothScrollToPosition(0);
                     if (swipeContainer.isRefreshing()) {
@@ -242,6 +263,14 @@ public class MainActivity extends AppCompatActivity
         super.onResume();
         if (movieList.isEmpty()) {
             checkSortOrder();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mRealm != null) {
+            mRealm.close();
         }
     }
 }

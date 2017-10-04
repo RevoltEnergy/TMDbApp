@@ -14,7 +14,7 @@ import retrofit2.Retrofit;
 @Module
 public class MovieModule {
 
-    @PerActivity
+//    @PerActivity
     @Provides
     MovieAPIService provideMovieAPIService(Retrofit retrofit){
         return retrofit.create(MovieAPIService.class);

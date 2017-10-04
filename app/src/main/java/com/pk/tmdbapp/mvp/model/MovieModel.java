@@ -5,11 +5,19 @@ import com.google.gson.annotations.SerializedName;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.realm.RealmObject;
+import io.realm.annotations.Ignore;
+import io.realm.annotations.PrimaryKey;
+
 /**
  * Created by ace on 10/02/2017.
  */
 
-public class Movie {
+public class MovieModel extends RealmObject {
+
+    @PrimaryKey
+    @SerializedName("id")
+    private long id;
 
     @SerializedName("poster_path")
     private String posterPath;
@@ -23,11 +31,9 @@ public class Movie {
     @SerializedName("release_date")
     private String releaseDate;
 
+    @Ignore
     @SerializedName("genre_ids")
     private List<Integer> genreIDs = new ArrayList<>();
-
-    @SerializedName("id")
-    private Integer id;
 
     @SerializedName("original_title")
     private String originalTitle;
@@ -53,10 +59,13 @@ public class Movie {
     @SerializedName("vote_average")
     private Double voteAverage;
 
-    public Movie(String posterPath, Boolean adult, String overview, String releaseDate,
-                 List<Integer> genreIDs, Integer id, String originalTitle,
-                 String originalLanguage, String title, String backdropPath, Double popularity,
-                 Integer voteCount, Boolean video, Double voteAverage) {
+    public MovieModel() {
+    }
+
+    public MovieModel(String posterPath, Boolean adult, String overview, String releaseDate,
+                      List<Integer> genreIDs, Integer id, String originalTitle,
+                      String originalLanguage, String title, String backdropPath, Double popularity,
+                      Integer voteCount, Boolean video, Double voteAverage) {
         this.posterPath = posterPath;
         this.adult = adult;
         this.overview = overview;
@@ -74,8 +83,7 @@ public class Movie {
     }
 
     public String getPosterPath() {
-        String baseImageUrl = "https://image.tmdb.org/t/p/w500";
-        return baseImageUrl + posterPath;
+        return posterPath;
     }
 
     public void setPosterPath(String posterPath) {
@@ -114,11 +122,11 @@ public class Movie {
         this.genreIDs = genreIDs;
     }
 
-    public Integer getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(long id) {
         this.id = id;
     }
 

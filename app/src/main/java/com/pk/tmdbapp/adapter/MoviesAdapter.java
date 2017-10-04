@@ -14,7 +14,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.pk.tmdbapp.activities.DetailActivity;
 import com.pk.tmdbapp.R;
-import com.pk.tmdbapp.mvp.model.Movie;
+import com.pk.tmdbapp.mvp.model.MovieModel;
 
 import java.util.List;
 
@@ -25,9 +25,9 @@ import java.util.List;
 public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MyViewHolder> {
 
     private Context mContext;
-    private List<Movie> movieList;
+    private List<MovieModel> movieList;
 
-    public MoviesAdapter(Context mContext, List<Movie> movieList) {
+    public MoviesAdapter(Context mContext, List<MovieModel> movieList) {
         this.mContext = mContext;
         this.movieList = movieList;
     }
@@ -44,9 +44,10 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MyViewHold
         viewHolder.title.setText(movieList.get(position).getOriginalTitle());
         String vote = Double.toString(movieList.get(position).getVoteAverage());
         viewHolder.userRating.setText(vote);
+        String baseImageUrl = "https://image.tmdb.org/t/p/w500";
 
         Glide.with(mContext)
-                .load(movieList.get(position).getPosterPath())
+                .load(baseImageUrl + movieList.get(position).getPosterPath())
                 .apply(new RequestOptions()
                         .placeholder(R.drawable.load)
                         .error(R.drawable.load))
@@ -75,7 +76,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MyViewHold
                 public void onClick(View v) {
                     int position = getAdapterPosition();
                     if (position != RecyclerView.NO_POSITION) {
-                        Movie clickedDataItem = movieList.get(position);
+                        MovieModel clickedDataItem = movieList.get(position);
                         Intent intent = new Intent(mContext, DetailActivity.class);
                         intent.putExtra("original_title", movieList.get(position).getOriginalTitle());
                         intent.putExtra("poster_path", movieList.get(position).getPosterPath());

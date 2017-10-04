@@ -19,7 +19,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.github.ivbaranov.mfb.MaterialFavoriteButton;
 import com.pk.tmdbapp.R;
 import com.pk.tmdbapp.db.DBService;
-import com.pk.tmdbapp.db.models.MovieModel;
+import com.pk.tmdbapp.mvp.model.MovieModel;
 
 import io.realm.Realm;
 
@@ -67,7 +67,7 @@ public class DetailActivity extends AppCompatActivity {
             String dateOfRelease = getIntent().getExtras().getString("release_date");
 
             movieModel.setTitle(getIntent().getExtras().getString("original_title"));
-            movieModel.setUserRating(rating);
+            movieModel.setVoteAverage(Double.valueOf(rating));
             movieModel.setPosterPath(thumbnail);
             movieModel.setOverview(synopsis);
 

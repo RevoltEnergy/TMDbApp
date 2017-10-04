@@ -32,9 +32,8 @@ public class ApplicationModule {
     private Context mContext;
 
     // Constructor needs one parameter to instantiate.
-    public ApplicationModule(Context mContext, String baseUrl) {
+    public ApplicationModule(Context mContext) {
         this.mContext = mContext;
-        this.mBaseUrl = baseUrl;
     }
 
     // Dagger will only look for methods annotated with @Provides
@@ -90,6 +89,12 @@ public class ApplicationModule {
                 .baseUrl(mBaseUrl)
                 .client(okHttpClient)
                 .build();
+    }
+
+    @Provides
+    @Singleton
+    DatabaseModule provideDatabase(Context context) {
+        return new DatabaseModule(context);
     }
 
     @Provides

@@ -66,7 +66,7 @@ public class DBService {
 
         return Observable.just(object)
                 .flatMap(t -> Observable.just(t)
-                        .doOnSubscribe(lol -> realm.executeTransaction(realm1 -> {
+                        .doOnSubscribe(disposable -> realm.executeTransaction(realm1 -> {
                             RealmResults<MovieModel> row = realm1.where(MovieModel.class)
                                     .equalTo("title",((MovieModel) object).getTitle())
                                     .findAll();

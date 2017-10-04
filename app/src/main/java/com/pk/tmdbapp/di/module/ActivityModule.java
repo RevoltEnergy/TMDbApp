@@ -1,8 +1,8 @@
 package com.pk.tmdbapp.di.module;
 
 import android.content.Context;
-import android.support.v7.app.AppCompatActivity;
 
+import com.pk.tmdbapp.MainActivity;
 import com.pk.tmdbapp.di.qualifier.ActivityContext;
 import com.pk.tmdbapp.di.scope.PerActivity;
 
@@ -16,9 +16,9 @@ import dagger.Provides;
 @Module
 public class ActivityModule {
 
-    private final AppCompatActivity mActivity;
+    private final MainActivity mActivity;
 
-    public ActivityModule(AppCompatActivity activity) {
+    public ActivityModule(MainActivity activity) {
         mActivity = activity;
     }
 

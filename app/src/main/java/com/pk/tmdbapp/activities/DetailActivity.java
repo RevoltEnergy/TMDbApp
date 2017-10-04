@@ -2,6 +2,7 @@ package com.pk.tmdbapp.activities;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.icu.text.DateFormat;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
@@ -21,6 +22,8 @@ import com.pk.tmdbapp.R;
 import com.pk.tmdbapp.db.DBService;
 import com.pk.tmdbapp.mvp.model.MovieModel;
 
+import javax.inject.Inject;
+
 import io.realm.Realm;
 
 /**
@@ -28,6 +31,8 @@ import io.realm.Realm;
  */
 
 public class DetailActivity extends AppCompatActivity {
+
+    @Inject Realm mRealm;
 
     TextView nameOfMovie;
     TextView plotSynopsis;
@@ -45,8 +50,6 @@ public class DetailActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         initCollapsingToolbar();
-
-        Realm.init(this);
 
         DBService dbService = new DBService();
 
@@ -71,8 +74,10 @@ public class DetailActivity extends AppCompatActivity {
             movieModel.setPosterPath(thumbnail);
             movieModel.setOverview(synopsis);
 
+            String baseImageUrl = "https://image.tmdb.org/t/p/w500";
+
             Glide.with(this)
-                    .load(thumbnail)
+                    .load(baseImageUrl + thumbnail)
                     .apply(new RequestOptions()
                             .placeholder(R.drawable.load)
                             .error(R.drawable.load))
@@ -88,9 +93,6 @@ public class DetailActivity extends AppCompatActivity {
 
         MaterialFavoriteButton materialFavoriteButton =
                 (MaterialFavoriteButton) findViewById(R.id.favorite_button);
-
-        SharedPreferences sharedPreferences =
-                PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
         materialFavoriteButton.setOnFavoriteChangeListener(new MaterialFavoriteButton.OnFavoriteChangeListener() {
             SharedPreferences.Editor editor =
@@ -115,12 +117,12 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     private void removeFavorite(DBService dbService, MovieModel movieModel) {
-        dbService.remove(movieModel, MovieModel.class)
+        dbService.remove(mRealm, movieModel)
                 .subscribe(movieModelConsumer -> Toast.makeText(getBaseContext(), "Removed", Toast.LENGTH_SHORT).show());
     }
 
     private void saveFavorite(DBService dbService, MovieModel movieModel) {
-        dbService.save(movieModel, MovieModel.class)
+        dbService.save(mRealm, movieModel, MovieModel.class)
                 .subscribe(movieModelConsumer -> Toast.makeText(getBaseContext(), "Saved", Toast.LENGTH_SHORT).show());
     }
 

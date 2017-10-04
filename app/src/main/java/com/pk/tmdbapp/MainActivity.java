@@ -1,7 +1,6 @@
 package com.pk.tmdbapp;
 
 import android.app.Activity;
-import android.app.Application;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.ContextWrapper;
@@ -27,7 +26,6 @@ import com.pk.tmdbapp.api.Client;
 import com.pk.tmdbapp.api.MovieAPIService;
 import com.pk.tmdbapp.application.TMDbApplication;
 import com.pk.tmdbapp.db.DBService;
-import com.pk.tmdbapp.di.module.ApplicationModule;
 import com.pk.tmdbapp.mvp.model.MovieModel;
 import com.pk.tmdbapp.mvp.model.MoviesResponse;
 import com.pk.tmdbapp.mvp.view.MainView;
@@ -45,7 +43,8 @@ import retrofit2.Response;
 public class MainActivity extends AppCompatActivity
         implements SharedPreferences.OnSharedPreferenceChangeListener, MainView {
 
-    @Inject protected Realm mRealm;
+    @Inject
+    protected Realm mRealm;
 
     private RecyclerView recyclerView;
     private MoviesAdapter adapter;
@@ -59,10 +58,6 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         ((TMDbApplication) getApplication()).getAppComponent().inject(this);
         setContentView(R.layout.activity_main);
-
-        System.out.println("###########################################################################################");
-        if (mRealm == null) System.out.println("realm null MA");
-        System.out.println("###########################################################################################");
 
         initViews();
     }
@@ -109,15 +104,11 @@ public class MainActivity extends AppCompatActivity
 
         movieList.clear();
 
-        dbService.getAll(MovieModel.class).subscribe(movieModels -> movieList.addAll(movieModels));
+        dbService.getAll(mRealm, MovieModel.class).subscribe(movieModels -> movieList.addAll(movieModels));
 
         if (movieList.isEmpty()) {
             Toast.makeText(MainActivity.this, "You have no favorite movie added", Toast.LENGTH_SHORT).show();
             loadPopularMoviesJSON();
-            /*SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-            SharedPreferences.Editor editor = preferences.edit();
-            editor.remove(this.getString(R.string.favorite));
-            editor.apply();*/
         }
 
         adapter = new MoviesAdapter(this, movieList);

@@ -8,6 +8,7 @@ import android.preference.PreferenceManager;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.pk.tmdbapp.db.migration.RealmMovieMigration;
 
 import java.util.concurrent.TimeUnit;
 
@@ -15,6 +16,8 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
+import io.realm.Realm;
+import io.realm.RealmConfiguration;
 import okhttp3.Cache;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
@@ -28,18 +31,14 @@ import retrofit2.converter.gson.GsonConverterFactory;
 @Module
 public class ApplicationModule {
 
-    private String mBaseUrl;
     private Context mContext;
 
-    // Constructor needs one parameter to instantiate.
     public ApplicationModule(Context mContext) {
         this.mContext = mContext;
     }
 
-    // Dagger will only look for methods annotated with @Provides
     @Provides
     @Singleton
-    // Application reference must come from AppModule.class
     SharedPreferences providesSharedPreferences(Application application) {
         return PreferenceManager.getDefaultSharedPreferences(application);
     }
@@ -84,21 +83,29 @@ public class ApplicationModule {
     @Provides
     @Singleton
     Retrofit provideRetrofit(GsonConverterFactory factory, OkHttpClient okHttpClient) {
+        final String BASE_URL = "http://api.themoviedb.org/3/";
         return new Retrofit.Builder()
                 .addConverterFactory(factory)
-                .baseUrl(mBaseUrl)
+                .baseUrl(BASE_URL)
                 .client(okHttpClient)
                 .build();
     }
 
     @Provides
-    @Singleton
-    DatabaseModule provideDatabase(Context context) {
-        return new DatabaseModule(context);
+    Realm provideRealm(Context context) {
+        Realm.init(context);
+        Realm.removeDefaultConfiguration();
+        RealmConfiguration config = new RealmConfiguration.Builder()
+                .schemaVersion(1)
+                .migration(new RealmMovieMigration())
+                .deleteRealmIfMigrationNeeded()
+                .build();
+
+        Realm.setDefaultConfiguration(config);
+        return Realm.getDefaultInstance();
     }
 
     @Provides
-    @Singleton
     Context provideContext() {
         return mContext;
     }

@@ -44,6 +44,7 @@ public class MainActivity extends AppCompatActivity
         implements SharedPreferences.OnSharedPreferenceChangeListener, MainView {
 
     private SharedPreferences preferences;
+    private boolean favorite_menu = false;
 
     @Inject protected Realm mRealm;
     //@Inject protected Retrofit mRetrofit;
@@ -211,7 +212,19 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
+
         return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        menu.clear();
+        if (favorite_menu) {
+            getMenuInflater().inflate(R.menu.menu_favorite, menu);
+        } else {
+            getMenuInflater().inflate(R.menu.menu_main, menu);
+        }
+        return super.onPrepareOptionsMenu(menu);
     }
 
     @Override
@@ -259,12 +272,18 @@ public class MainActivity extends AppCompatActivity
         );
         if (sortOrder.equals(this.getString(R.string.pref_most_popular))) {
             Log.d(LOG_TAG, "Sorting by most popular");
+            favorite_menu = false;
+            invalidateOptionsMenu();
             loadPopularMoviesJSON();
         } else if (sortOrder.equals(this.getString(R.string.pref_favorite))) {
             Log.d(LOG_TAG, "Sorting by favorite");
+            favorite_menu = true;
+            invalidateOptionsMenu();
             loadFavoriteMovies();
         } else {
             Log.d(LOG_TAG, "Sorting by top rated");
+            favorite_menu = false;
+            invalidateOptionsMenu();
             loadTopRatedMoviesJSON();
         }
     }

@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.ContextWrapper;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -19,6 +20,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.pk.tmdbapp.activities.SettingsActivity;
 import com.pk.tmdbapp.adapter.MoviesAdapter;
 import com.pk.tmdbapp.api.Client;
 import com.pk.tmdbapp.api.MovieAPIService;
@@ -244,6 +246,10 @@ public class MainActivity extends AppCompatActivity
                 updateSortPreferences(
                         this.getString(R.string.pref_sort_order_key),
                         this.getString(R.string.pref_favorite));
+                return true;
+            case R.id.menu_settings:
+                Intent intent = new Intent(this, SettingsActivity.class);
+                startActivity(intent);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

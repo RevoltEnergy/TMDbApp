@@ -8,6 +8,7 @@ import java.util.List;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
+import io.reactivex.Observer;
 import io.realm.Realm;
 import io.realm.RealmObject;
 import io.realm.RealmResults;
@@ -89,5 +90,9 @@ public class DBService {
                         .onErrorResumeNext((ObservableSource<? extends Class<T>>) observer -> Observable.empty())
                         .map(r -> realm.where(r).findAll())
                 );
+    }
+
+    public <T extends RealmObject> Observable removeAll(Realm realm) {
+        return Observable.empty().doOnSubscribe(disposable -> realm.executeTransaction(realm1 -> realm1.deleteAll()));
     }
 }

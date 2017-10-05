@@ -18,6 +18,13 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
+            <ProgressBar
+                android:id="@+id/progress"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/movie_cover_height"
+                android:paddingTop="50dp"
+                android:visibility="visible" />
+
             <ImageView
                 android:id="@+id/thumbnail"
                 android:layout_width="match_parent"

@@ -9,7 +9,10 @@ import android.widget.ListView;
 
 import com.pk.tmdbapp.MainActivity;
 import com.pk.tmdbapp.R;
+import com.pk.tmdbapp.application.TMDbApplication;
 import com.pk.tmdbapp.db.DBService;
+
+import javax.inject.Inject;
 
 import io.realm.Realm;
 
@@ -19,35 +22,22 @@ import io.realm.Realm;
 
 public class SettingsActivity extends PreferenceActivity {
 
-    private ListView listView;
+    @Inject Realm realm;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
-        //getFragmentManager().beginTransaction().replace(android.R.id.content, new SettingsFragment()).commit();
+        ((TMDbApplication) getApplication()).getAppComponent().inject(this);
 
         final Button button = (Button) findViewById(R.id.clear_favorite_button);
         button.setOnClickListener(v -> {
-            Realm realm = Realm.getDefaultInstance();
+//            Realm realm = Realm.getDefaultInstance();
             DBService dbService = new DBService();
             dbService.removeAll(realm).subscribe();
             realm.close();
             Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);
         });
-
-
     }
-
-
-
-    /*public static class SettingsFragment extends PreferenceFragment {
-
-        @Override
-        public void onCreate(@Nullable final Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            addPreferencesFromResource(R.xml.preferences);
-        }
-    }*/
 }

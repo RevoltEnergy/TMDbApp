@@ -20,6 +20,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.pk.tmdbapp.activities.NoInternetActivity;
 import com.pk.tmdbapp.activities.SettingsActivity;
 import com.pk.tmdbapp.adapter.MoviesAdapter;
 import com.pk.tmdbapp.api.Client;
@@ -30,6 +31,7 @@ import com.pk.tmdbapp.db.realmmodel.RealmMovie;
 import com.pk.tmdbapp.mvp.model.MovieModel;
 import com.pk.tmdbapp.mvp.model.MoviesResponse;
 import com.pk.tmdbapp.mvp.view.MainView;
+import com.pk.tmdbapp.util.CheckNetwork;
 import com.pk.tmdbapp.util.RealmMapper;
 
 import java.util.ArrayList;
@@ -61,10 +63,16 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ((TMDbApplication) getApplication()).getAppComponent().inject(this);
         setContentView(R.layout.activity_main);
-        preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
+        preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        ((TMDbApplication) getApplication()).getAppComponent().inject(this);
+
+        if (!CheckNetwork.isInternetAvailable(this)) {
+            updateSortPreferences(
+                    this.getString(R.string.pref_sort_order_key),
+                    this.getString(R.string.pref_favorite));
+        }
         initViews();
     }
 
@@ -111,6 +119,10 @@ public class MainActivity extends AppCompatActivity
 
         if (movies.isEmpty()) {
             Toast.makeText(MainActivity.this, "You have no favorite movie added", Toast.LENGTH_SHORT).show();
+            if (!CheckNetwork.isInternetAvailable(this)) {
+                Intent intent = new Intent(this, NoInternetActivity.class);
+                startActivity(intent);
+            }
             updateSortPreferences(
                     this.getString(R.string.pref_sort_order_key),
                     this.getString(R.string.pref_most_popular));
@@ -155,6 +167,9 @@ public class MainActivity extends AppCompatActivity
                 public void onFailure(@NonNull Call<MoviesResponse> call, @NonNull Throwable t) {
                     Log.d("Error", t.getMessage());
                     Toast.makeText(MainActivity.this, "Error Fetching Data", Toast.LENGTH_SHORT).show();
+                    updateSortPreferences(
+                            getApplication().getString(R.string.pref_sort_order_key),
+                            getApplication().getString(R.string.pref_favorite));
                 }
             });
         } catch (Exception e) {
@@ -261,13 +276,20 @@ public class MainActivity extends AppCompatActivity
         editor.clear();
         editor.putString(key, value);
         editor.apply();
-        checkSortOrder();
+        editor.commit();
+        //checkSortOrder();
     }
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         Log.d(LOG_TAG, "Preferences updated");
         checkSortOrder();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        preferences.unregisterOnSharedPreferenceChangeListener(this);
     }
 
     private void checkSortOrder() {
@@ -297,6 +319,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
+        preferences.registerOnSharedPreferenceChangeListener(this);
         if (movieList.isEmpty()) {
             checkSortOrder();
         }

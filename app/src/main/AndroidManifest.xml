@@ -32,6 +32,10 @@
             android:name=".activities.SettingsActivity"
             android:label="Settings">
         </activity>
+        <activity
+            android:name=".activities.NoInternetActivity"
+            android:label="No Internet">
+        </activity>
     </application>
 
 </manifest>

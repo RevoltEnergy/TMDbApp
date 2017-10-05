@@ -2,6 +2,7 @@ package com.pk.tmdbapp.di.component;
 
 import com.pk.tmdbapp.MainActivity;
 import com.pk.tmdbapp.activities.DetailActivity;
+import com.pk.tmdbapp.activities.NoInternetActivity;
 import com.pk.tmdbapp.activities.SettingsActivity;
 import com.pk.tmdbapp.application.TMDbApplication;
 import com.pk.tmdbapp.di.module.ApplicationModule;
@@ -21,4 +22,5 @@ public interface ApplicationComponent {
     void inject(MainActivity mainActivity);
     void inject(DetailActivity detailActivity);
     void inject(SettingsActivity settingsActivity);
+    void inject(NoInternetActivity activity);
 }

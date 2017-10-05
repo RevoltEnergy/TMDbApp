@@ -21,9 +21,6 @@ public class DBService {
 
     public <T extends RealmObject> Observable<T> save(Realm realm, T object, Class<T> clazz) {
 
-        /*realm.executeTransaction(realm1 -> realm1.deleteAll());
-        return Observable.just(object).doOnSubscribe(disposable -> {});*/
-
         /*List<MovieModel> movieModels = realm.where(MovieModel.class).findAll();
         for (MovieModel movie : movieModels) {
             System.out.println("############################# " + movie.getOriginalTitle());

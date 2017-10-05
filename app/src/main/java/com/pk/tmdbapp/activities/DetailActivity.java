@@ -21,7 +21,9 @@ import com.github.ivbaranov.mfb.MaterialFavoriteButton;
 import com.pk.tmdbapp.R;
 import com.pk.tmdbapp.application.TMDbApplication;
 import com.pk.tmdbapp.db.DBService;
+import com.pk.tmdbapp.db.realmmodel.RealmMovie;
 import com.pk.tmdbapp.mvp.model.MovieModel;
+import com.pk.tmdbapp.util.RealmMapper;
 
 import javax.inject.Inject;
 
@@ -71,8 +73,10 @@ public class DetailActivity extends AppCompatActivity {
             String rating = getIntent().getExtras().getString("vote_average");
             String dateOfRelease = getIntent().getExtras().getString("release_date");
 
-            movieModel.setTitle(getIntent().getExtras().getString("original_title"));
+            movieModel.setTitle(getIntent().getExtras().getString("title"));
+            movieModel.setOriginalTitle(getIntent().getExtras().getString("original_title"));
             movieModel.setVoteAverage(Double.valueOf(rating));
+            movieModel.setReleaseDate(dateOfRelease);
             movieModel.setPosterPath(thumbnail);
             movieModel.setOverview(synopsis);
 
@@ -119,12 +123,12 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     private void removeFavorite(DBService dbService, MovieModel movieModel) {
-        dbService.remove(mRealm, movieModel)
+        dbService.remove(mRealm, RealmMapper.mapToRealmMovie(movieModel))
                 .subscribe(movieModelConsumer -> Toast.makeText(getBaseContext(), "Removed", Toast.LENGTH_SHORT).show());
     }
 
     private void saveFavorite(DBService dbService, MovieModel movieModel) {
-        dbService.save(mRealm, movieModel, MovieModel.class)
+        dbService.save(mRealm, RealmMapper.mapToRealmMovie(movieModel), RealmMovie.class)
                 .subscribe(movieModelConsumer -> Toast.makeText(getBaseContext(), "Saved", Toast.LENGTH_SHORT).show());
     }
 

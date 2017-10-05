@@ -2,10 +2,8 @@ package com.pk.tmdbapp.db;
 
 import android.util.Log;
 
-import com.pk.tmdbapp.MainActivity;
-import com.pk.tmdbapp.mvp.model.MovieModel;
+import com.pk.tmdbapp.db.realmmodel.RealmMovie;
 
-import java.util.Arrays;
 import java.util.List;
 
 import io.reactivex.Observable;
@@ -30,10 +28,27 @@ public class DBService {
             System.out.println("############################# " + movie.getOriginalTitle());
         }*/
 
-        MovieModel movie = realm.where(MovieModel.class).equalTo("title", ((MovieModel) object).getTitle()).findFirst();
+        System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+        System.out.println(((RealmMovie) object).getTitle());
+        System.out.println(((RealmMovie) object).getOriginalTitle());
+        System.out.println(((RealmMovie) object).getPosterPath());
+        System.out.println(((RealmMovie) object).getOverview());
+        System.out.println(((RealmMovie) object).getReleaseDate());
+        System.out.println(((RealmMovie) object).getVoteAverage());
+        System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+
+        RealmMovie movie = realm.where(RealmMovie.class).equalTo("title", ((RealmMovie) object).getTitle()).findFirst();
 
         if (movie != null) {
-            if (((MovieModel) object).getTitle().equals(movie.getTitle())) {
+            System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+            System.out.println(movie.getTitle());
+            System.out.println(movie.getOriginalTitle());
+            System.out.println(movie.getPosterPath());
+            System.out.println(movie.getOverview());
+            System.out.println(movie.getReleaseDate());
+            System.out.println(movie.getVoteAverage());
+            System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+            if (((RealmMovie) object).getTitle().equals(movie.getTitle())) {
                 return Observable.just(object).doOnSubscribe(disposable -> {});
             }
         }
@@ -46,7 +61,7 @@ public class DBService {
             Log.d("DB", e.getMessage());
         }
 
-        ((MovieModel) object).setId(id);
+        ((RealmMovie) object).setId(id);
 
         return Observable.just(object)
                 .flatMap(t -> Observable.just(t)
@@ -59,8 +74,8 @@ public class DBService {
         return Observable.just(object)
                 .flatMap(t -> Observable.just(t)
                         .doOnSubscribe(disposable -> realm.executeTransaction(realm1 -> {
-                            RealmResults<MovieModel> row = realm1.where(MovieModel.class)
-                                    .equalTo("title",((MovieModel) object).getTitle())
+                            RealmResults<RealmMovie> row = realm1.where(RealmMovie.class)
+                                    .equalTo("title",((RealmMovie) object).getTitle())
                                     .findAll();
                             row.deleteAllFromRealm();
                         }))
@@ -70,8 +85,7 @@ public class DBService {
     public <T extends RealmObject> Observable<List<T>> getAll(Realm realm, Class<T> clazz) {
         return Observable.just(clazz)
                 .flatMap(t -> Observable.just(t)
-                        .doOnSubscribe(lol -> realm.executeTransaction(realm1 ->
-                                realm1.where(MovieModel.class).findAll()))
+                        .doOnSubscribe(lol -> realm.executeTransaction(realm1 -> realm1.where(RealmMovie.class).findAll()))
                         .onErrorResumeNext((ObservableSource<? extends Class<T>>) observer -> Observable.empty())
                         .map(r -> realm.where(r).findAll())
                 );

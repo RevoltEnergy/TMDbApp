@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.ContextWrapper;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -20,15 +19,16 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.pk.tmdbapp.activities.SettingsActivity;
 import com.pk.tmdbapp.adapter.MoviesAdapter;
 import com.pk.tmdbapp.api.Client;
 import com.pk.tmdbapp.api.MovieAPIService;
 import com.pk.tmdbapp.application.TMDbApplication;
 import com.pk.tmdbapp.db.DBService;
+import com.pk.tmdbapp.db.realmmodel.RealmMovie;
 import com.pk.tmdbapp.mvp.model.MovieModel;
 import com.pk.tmdbapp.mvp.model.MoviesResponse;
 import com.pk.tmdbapp.mvp.view.MainView;
+import com.pk.tmdbapp.util.RealmMapper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +39,6 @@ import io.realm.Realm;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
 
 public class MainActivity extends AppCompatActivity
         implements SharedPreferences.OnSharedPreferenceChangeListener, MainView {
@@ -100,33 +99,29 @@ public class MainActivity extends AppCompatActivity
 
     private void loadFavoriteMovies() {
 
-        recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-        movieList = new ArrayList<>();
-
         DBService dbService = new DBService();
 
-        movieList.clear();
+        List<MovieModel> movies = new ArrayList<>();
 
-        dbService.getAll(mRealm, MovieModel.class).subscribe(movieModels -> movieList.addAll(movieModels));
+        dbService.getAll(mRealm, RealmMovie.class).subscribe(movieModels ->
+                movies.addAll(RealmMapper.mapToMovieModelList(movieModels)));
 
-        if (movieList.isEmpty()) {
+        if (movies.isEmpty()) {
             Toast.makeText(MainActivity.this, "You have no favorite movie added", Toast.LENGTH_SHORT).show();
-            loadPopularMoviesJSON();
+            updateSortPreferences(
+                    this.getString(R.string.pref_sort_order_key),
+                    this.getString(R.string.pref_most_popular));
+            checkSortOrder();
         }
-
-        adapter = new MoviesAdapter(this, movieList);
-
-        if (getActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-            recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
-        } else {
-            recyclerView.setLayoutManager(new GridLayoutManager(this, 4));
+        recyclerView.setAdapter(new MoviesAdapter(getApplicationContext(), movies));
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.smoothScrollToPosition(0);
+        if (swipeContainer.isRefreshing()) {
+            swipeContainer.setRefreshing(false);
         }
-
         progressDialog.dismiss();
 
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.setAdapter(adapter);
-        adapter.notifyDataSetChanged();
+        Toast.makeText(MainActivity.this, "Favorite Movies", Toast.LENGTH_SHORT).show();
     }
 
     private void loadPopularMoviesJSON() {
@@ -163,6 +158,7 @@ public class MainActivity extends AppCompatActivity
             Log.d("Error", e.getMessage());
             Toast.makeText(this, e.toString(), Toast.LENGTH_SHORT).show();
         }
+        Toast.makeText(MainActivity.this, "Most Popular Movies", Toast.LENGTH_SHORT).show();
     }
 
     private void loadTopRatedMoviesJSON() {
@@ -198,6 +194,7 @@ public class MainActivity extends AppCompatActivity
             Log.d("Error", e.getMessage());
             Toast.makeText(this, e.toString(), Toast.LENGTH_SHORT).show();
         }
+        Toast.makeText(MainActivity.this, "Top Rated Movies", Toast.LENGTH_SHORT).show();
     }
 
     public Activity getActivity() {
@@ -221,17 +218,17 @@ public class MainActivity extends AppCompatActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_most_popular:
-                updatePreferences(
+                updateSortPreferences(
                         this.getString(R.string.pref_sort_order_key),
                         this.getString(R.string.pref_most_popular));
                 return true;
             case R.id.menu_highest_rated:
-                updatePreferences(
+                updateSortPreferences(
                         this.getString(R.string.pref_sort_order_key),
                         this.getString(R.string.pref_highest_rated));
                 return true;
             case R.id.menu_favorite:
-                updatePreferences(
+                updateSortPreferences(
                         this.getString(R.string.pref_sort_order_key),
                         this.getString(R.string.pref_favorite));
                 return true;
@@ -240,7 +237,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private void updatePreferences(String key, String value) {
+    private void updateSortPreferences(String key, String value) {
         SharedPreferences.Editor editor = preferences.edit();
         editor.clear();
         editor.putString(key, value);

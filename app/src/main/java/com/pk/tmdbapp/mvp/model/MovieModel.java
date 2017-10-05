@@ -5,17 +5,14 @@ import com.google.gson.annotations.SerializedName;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.realm.RealmObject;
 import io.realm.annotations.Ignore;
-import io.realm.annotations.PrimaryKey;
 
 /**
  * Created by ace on 10/02/2017.
  */
 
-public class MovieModel extends RealmObject {
+public class MovieModel {
 
-    @PrimaryKey
     @SerializedName("id")
     private long id;
 

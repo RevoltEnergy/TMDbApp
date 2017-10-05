@@ -39,17 +39,20 @@ import io.realm.Realm;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import retrofit2.Retrofit;
 
 public class MainActivity extends AppCompatActivity
         implements SharedPreferences.OnSharedPreferenceChangeListener, MainView {
 
-    @Inject
-    protected Realm mRealm;
+    private SharedPreferences preferences;
+
+    @Inject protected Realm mRealm;
+    //@Inject protected Retrofit mRetrofit;
 
     private RecyclerView recyclerView;
     private MoviesAdapter adapter;
     private List<MovieModel> movieList;
-    ProgressDialog progressDialog;
+    private ProgressDialog progressDialog;
     private SwipeRefreshLayout swipeContainer;
     public static final String LOG_TAG = MoviesAdapter.class.getName();
 
@@ -58,11 +61,13 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         ((TMDbApplication) getApplication()).getAppComponent().inject(this);
         setContentView(R.layout.activity_main);
+        preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         initViews();
     }
 
     private void initViews() {
+
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Fetching movies...");
         progressDialog.setCancelable(false);
@@ -94,8 +99,6 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void loadFavoriteMovies() {
-
-        //Realm.init(this);
 
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         movieList = new ArrayList<>();
@@ -136,6 +139,7 @@ public class MainActivity extends AppCompatActivity
             }
 
             MovieAPIService apiMovieService = Client.getClient().create(MovieAPIService.class);
+            //MovieAPIService apiMovieService = mRetrofit.create(MovieAPIService.class);
             Call<MoviesResponse> call = apiMovieService.getPopularMovies(BuildConfig.TMDB_API_KEY);
             call.enqueue(new Callback<MoviesResponse>() {
                 @Override
@@ -216,13 +220,32 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.menu_settings:
-                Intent intent = new Intent(this, SettingsActivity.class);
-                startActivity(intent);
+            case R.id.menu_most_popular:
+                updatePreferences(
+                        this.getString(R.string.pref_sort_order_key),
+                        this.getString(R.string.pref_most_popular));
+                return true;
+            case R.id.menu_highest_rated:
+                updatePreferences(
+                        this.getString(R.string.pref_sort_order_key),
+                        this.getString(R.string.pref_highest_rated));
+                return true;
+            case R.id.menu_favorite:
+                updatePreferences(
+                        this.getString(R.string.pref_sort_order_key),
+                        this.getString(R.string.pref_favorite));
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void updatePreferences(String key, String value) {
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.clear();
+        editor.putString(key, value);
+        editor.apply();
+        checkSortOrder();
     }
 
     @Override
@@ -232,7 +255,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void checkSortOrder() {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+
         String sortOrder = preferences.getString(
                 this.getString(R.string.pref_sort_order_key),
                 this.getString(R.string.pref_most_popular)
@@ -240,7 +263,7 @@ public class MainActivity extends AppCompatActivity
         if (sortOrder.equals(this.getString(R.string.pref_most_popular))) {
             Log.d(LOG_TAG, "Sorting by most popular");
             loadPopularMoviesJSON();
-        } else if (sortOrder.equals(this.getString(R.string.favorite))) {
+        } else if (sortOrder.equals(this.getString(R.string.pref_favorite))) {
             Log.d(LOG_TAG, "Sorting by favorite");
             loadFavoriteMovies();
         } else {

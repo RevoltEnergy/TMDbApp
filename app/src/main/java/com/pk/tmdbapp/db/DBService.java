@@ -2,8 +2,10 @@ package com.pk.tmdbapp.db;
 
 import android.util.Log;
 
+import com.pk.tmdbapp.MainActivity;
 import com.pk.tmdbapp.mvp.model.MovieModel;
 
+import java.util.Arrays;
 import java.util.List;
 
 import io.reactivex.Observable;
@@ -18,12 +20,22 @@ import io.realm.RealmResults;
 
 public class DBService {
 
-    public <T extends RealmObject> Observable<T> save(Realm mRealm, T object, Class<T> clazz) {
+    public <T extends RealmObject> Observable<T> save(Realm realm, T object, Class<T> clazz) {
 
-        Realm realm = Realm.getDefaultInstance();
+        /*realm.executeTransaction(realm1 -> realm1.deleteAll());
+        return Observable.just(object).doOnSubscribe(disposable -> {});*/
 
-        if (realm.where(clazz).equalTo("originalTitle", ((MovieModel) object).getOriginalTitle()).findFirst() != null) {
-            return Observable.just(object).doOnSubscribe(disposable -> {});
+        /*List<MovieModel> movieModels = realm.where(MovieModel.class).findAll();
+        for (MovieModel movie : movieModels) {
+            System.out.println("############################# " + movie.getOriginalTitle());
+        }*/
+
+        MovieModel movie = realm.where(MovieModel.class).equalTo("title", ((MovieModel) object).getTitle()).findFirst();
+
+        if (movie != null) {
+            if (((MovieModel) object).getTitle().equals(movie.getTitle())) {
+                return Observable.just(object).doOnSubscribe(disposable -> {});
+            }
         }
 
         long id = 0L;
@@ -38,12 +50,12 @@ public class DBService {
 
         return Observable.just(object)
                 .flatMap(t -> Observable.just(t)
-                        .doOnSubscribe(disposable -> realm.executeTransaction(realm1 -> realm1.copyToRealmOrUpdate(object)))
+                        .doOnSubscribe(disposable -> realm.executeTransaction(realm1 -> realm1.insertOrUpdate(object)))
                 );
     }
 
-    public <T extends RealmObject> Observable<T> remove(Realm mRealm, T object) {
-        Realm realm = Realm.getDefaultInstance();
+    public <T extends RealmObject> Observable<T> remove(Realm realm, T object) {
+
         return Observable.just(object)
                 .flatMap(t -> Observable.just(t)
                         .doOnSubscribe(disposable -> realm.executeTransaction(realm1 -> {

@@ -9,7 +9,6 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -36,13 +35,14 @@ import com.pk.tmdbapp.util.RealmMapper;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 import io.realm.Realm;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity
         implements SharedPreferences.OnSharedPreferenceChangeListener, MainView {
@@ -122,11 +122,14 @@ public class MainActivity extends AppCompatActivity
             if (!CheckNetwork.isInternetAvailable(this)) {
                 Intent intent = new Intent(this, NoInternetActivity.class);
                 startActivity(intent);
+            } else {
+                updateSortPreferences(
+                        this.getString(R.string.pref_sort_order_key),
+                        this.getString(R.string.pref_most_popular));
+                checkSortOrder();
             }
-            updateSortPreferences(
-                    this.getString(R.string.pref_sort_order_key),
-                    this.getString(R.string.pref_most_popular));
-            checkSortOrder();
+        } else {
+            Toast.makeText(MainActivity.this, "Favorite Movies", Toast.LENGTH_SHORT).show();
         }
         recyclerView.setAdapter(new MoviesAdapter(getApplicationContext(), movies));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -135,8 +138,6 @@ public class MainActivity extends AppCompatActivity
             swipeContainer.setRefreshing(false);
         }
         progressDialog.dismiss();
-
-        Toast.makeText(MainActivity.this, "Favorite Movies", Toast.LENGTH_SHORT).show();
     }
 
     private void loadPopularMoviesJSON() {
@@ -150,28 +151,28 @@ public class MainActivity extends AppCompatActivity
 
             MovieAPIService apiMovieService = Client.getClient().create(MovieAPIService.class);
             //MovieAPIService apiMovieService = mRetrofit.create(MovieAPIService.class);
-            Call<MoviesResponse> call = apiMovieService.getPopularMovies(BuildConfig.TMDB_API_KEY);
-            call.enqueue(new Callback<MoviesResponse>() {
-                @Override
-                public void onResponse(@NonNull Call<MoviesResponse> call, @NonNull Response<MoviesResponse> response) {
-                    List<MovieModel> movies = response.body().getResults();
-                    recyclerView.setAdapter(new MoviesAdapter(getApplicationContext(), movies));
-                    recyclerView.smoothScrollToPosition(0);
-                    if (swipeContainer.isRefreshing()) {
-                        swipeContainer.setRefreshing(false);
-                    }
-                    progressDialog.dismiss();
-                }
-
-                @Override
-                public void onFailure(@NonNull Call<MoviesResponse> call, @NonNull Throwable t) {
-                    Log.d("Error", t.getMessage());
-                    Toast.makeText(MainActivity.this, "Error Fetching Data", Toast.LENGTH_SHORT).show();
-                    updateSortPreferences(
-                            getApplication().getString(R.string.pref_sort_order_key),
-                            getApplication().getString(R.string.pref_favorite));
-                }
-            });
+            Observable<MoviesResponse> listObservable = apiMovieService.getPopularMoviesObs(BuildConfig.TMDB_API_KEY);
+            List<MovieModel> movies = new ArrayList<>();
+            listObservable
+                    .subscribeOn(Schedulers.computation())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .timeout(15, TimeUnit.SECONDS)
+                    .doOnComplete(() -> {
+                        recyclerView.setAdapter(new MoviesAdapter(getApplicationContext(), movies));
+                        recyclerView.smoothScrollToPosition(0);
+                        if (swipeContainer.isRefreshing()) {
+                            swipeContainer.setRefreshing(false);
+                        }
+                        progressDialog.dismiss();
+                    })
+                    .doOnError(throwable -> {
+                        Log.d("Error", throwable.getMessage());
+                        Toast.makeText(MainActivity.this, "Error Fetching Data", Toast.LENGTH_SHORT).show();
+                        updateSortPreferences(
+                                getApplication().getString(R.string.pref_sort_order_key),
+                                getApplication().getString(R.string.pref_favorite));
+                    })
+                    .subscribe(moviesResponse -> movies.addAll(moviesResponse.getResults()));
         } catch (Exception e) {
             Log.d("Error", e.getMessage());
             Toast.makeText(this, e.toString(), Toast.LENGTH_SHORT).show();
@@ -189,25 +190,29 @@ public class MainActivity extends AppCompatActivity
             }
 
             MovieAPIService apiMovieService = Client.getClient().create(MovieAPIService.class);
-            Call<MoviesResponse> call = apiMovieService.getTopRatedMovies(BuildConfig.TMDB_API_KEY);
-            call.enqueue(new Callback<MoviesResponse>() {
-                @Override
-                public void onResponse(@NonNull Call<MoviesResponse> call, @NonNull Response<MoviesResponse> response) {
-                    List<MovieModel> movies = response.body().getResults();
-                    recyclerView.setAdapter(new MoviesAdapter(getApplicationContext(), movies));
-                    recyclerView.smoothScrollToPosition(0);
-                    if (swipeContainer.isRefreshing()) {
-                        swipeContainer.setRefreshing(false);
-                    }
-                    progressDialog.dismiss();
-                }
 
-                @Override
-                public void onFailure(@NonNull Call<MoviesResponse> call, @NonNull Throwable t) {
-                    Log.d("Error", t.getMessage());
-                    Toast.makeText(MainActivity.this, "Error Fetching Data", Toast.LENGTH_SHORT).show();
-                }
-            });
+            Observable<MoviesResponse> listObservable = apiMovieService.getTopRatedMoviesObs(BuildConfig.TMDB_API_KEY);
+            List<MovieModel> movies = new ArrayList<>();
+            listObservable
+                    .subscribeOn(Schedulers.computation())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .timeout(15, TimeUnit.SECONDS)
+                    .doOnComplete(() -> {
+                        recyclerView.setAdapter(new MoviesAdapter(getApplicationContext(), movies));
+                        recyclerView.smoothScrollToPosition(0);
+                        if (swipeContainer.isRefreshing()) {
+                            swipeContainer.setRefreshing(false);
+                        }
+                        progressDialog.dismiss();
+                    })
+                    .doOnError(throwable -> {
+                        Log.d("Error", throwable.getMessage());
+                        Toast.makeText(MainActivity.this, "Error Fetching Data", Toast.LENGTH_SHORT).show();
+                        updateSortPreferences(
+                                getApplication().getString(R.string.pref_sort_order_key),
+                                getApplication().getString(R.string.pref_favorite));
+                    })
+                    .subscribe(moviesResponse -> movies.addAll(moviesResponse.getResults()));
         } catch (Exception e) {
             Log.d("Error", e.getMessage());
             Toast.makeText(this, e.toString(), Toast.LENGTH_SHORT).show();

@@ -2,22 +2,27 @@ package com.pk.tmdbapp.activities;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.icu.text.DateFormat;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.View;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.github.ivbaranov.mfb.MaterialFavoriteButton;
+import com.github.ybq.android.spinkit.style.ThreeBounce;
 import com.pk.tmdbapp.R;
 import com.pk.tmdbapp.application.TMDbApplication;
 import com.pk.tmdbapp.db.DBService;
@@ -42,6 +47,8 @@ public class DetailActivity extends AppCompatActivity {
     TextView userRating;
     TextView releaseDate;
     ImageView imageView;
+    ProgressBar progressBar;
+    ThreeBounce threeBounce;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -65,6 +72,10 @@ public class DetailActivity extends AppCompatActivity {
         userRating = (TextView) findViewById(R.id.user_rating);
         releaseDate = (TextView) findViewById(R.id.release_date);
 
+        progressBar = (ProgressBar) findViewById(R.id.progress_2);
+        threeBounce = new ThreeBounce();
+        progressBar.setIndeterminateDrawable(threeBounce);
+
         Intent intentThatStartedThisActivity = getIntent();
         if (intentThatStartedThisActivity.hasExtra("original_title")) {
             String thumbnail = getIntent().getExtras().getString("poster_path");
@@ -84,9 +95,19 @@ public class DetailActivity extends AppCompatActivity {
 
             Glide.with(this)
                     .load(baseImageUrl + thumbnail)
-                    .apply(new RequestOptions()
-                            .placeholder(R.drawable.load)
-                            .error(R.drawable.load))
+                    .listener(new RequestListener<Drawable>() {
+                        @Override
+                        public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                            progressBar.setVisibility(View.GONE);
+                            return false;
+                        }
+
+                        @Override
+                        public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                            progressBar.setVisibility(View.GONE);
+                            return false;
+                        }
+                    })
                     .into(imageView);
 
             nameOfMovie.setText(movieName);

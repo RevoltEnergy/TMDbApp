@@ -8,11 +8,15 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="windowActionBar">true</item>
         <item name="windowNoTitle">false</item>
+        <item name="SpinKitViewStyle">@style/SpinKitView.Large.Circle</item>
+
     </style>
     
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
+        <item name="SpinKitViewStyle">@style/SpinKitView.Large.Circle</item>
+
     </style>
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
@@ -21,6 +25,7 @@
     <style name="CollapsingToolbarLayoutExpandedTextStyle" parent="AppTheme">
         <item name="android:textColor">@android:color/transparent</item>
         <item name="android:textSize">0sp</item>
+        <item name="SpinKitViewStyle">@style/SpinKitView.Large.Circle</item>
     </style>
 
 </resources>

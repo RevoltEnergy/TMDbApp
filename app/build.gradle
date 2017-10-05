@@ -36,6 +36,7 @@ android {
 repositories {
     mavenCentral()
     maven { url 'https://maven.google.com' }
+    maven { url "https://jitpack.io" }
 }
 
 dependencies {
@@ -63,6 +64,7 @@ dependencies {
     compile 'com.google.dagger:dagger-android-support:2.11'
     compile 'com.android.support:support-v4:25.3.1'
     compile 'com.android.support:support-vector-drawable:25.3.1'
+    compile 'com.github.ybq:Android-SpinKit:1.1.0'
     testCompile 'junit:junit:4.12'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.1.1'
     annotationProcessor 'com.google.dagger:dagger-android-processor:2.11'

@@ -22,8 +22,17 @@
                 android:id="@+id/progress"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/movie_cover_height"
-                android:paddingTop="50dp"
+                android:layout_marginTop="50dp"
                 android:visibility="visible" />
+
+            <com.github.ybq.android.spinkit.SpinKitView
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/spin_kit"
+                style="@style/SpinKitView.Large"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/movie_cover_height"
+                android:layout_gravity="center"
+                app:SpinKit_Color="@color/colorPrimaryDark" />
 
             <ImageView
                 android:id="@+id/thumbnail"

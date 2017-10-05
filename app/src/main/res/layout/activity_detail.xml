@@ -29,6 +29,24 @@
             <RelativeLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content">
+
+                <ProgressBar
+                    android:id="@+id/progress_2"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/movie_cover_height"
+                    android:layout_marginTop="100dp"
+                    android:visibility="visible" />
+
+                <com.github.ybq.android.spinkit.SpinKitView
+                    xmlns:app="http://schemas.android.com/apk/res-auto"
+                    android:id="@+id/spin_kit"
+                    style="@style/SpinKitView.Large"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/movie_cover_height"
+                    android:layout_marginTop="100dp"
+                    android:layout_gravity="center"
+                    app:SpinKit_Color="@color/viewBg" />
+
                 <ImageView
                     android:id="@+id/thumbnail_image_header"
                     android:layout_width="match_parent"

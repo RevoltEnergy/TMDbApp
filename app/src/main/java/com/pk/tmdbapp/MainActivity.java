@@ -114,8 +114,8 @@ public class MainActivity extends AppCompatActivity
 
         List<MovieModel> movies = new ArrayList<>();
 
-        dbService.getAll(mRealm, RealmMovie.class).subscribe(movieModels ->
-                movies.addAll(RealmMapper.mapToMovieModelList(movieModels)));
+        dbService.getAll(mRealm, RealmMovie.class).subscribe(realmMovies ->
+                movies.addAll(RealmMapper.mapToMovieModelList(realmMovies)));
 
         if (movies.isEmpty()) {
             Toast.makeText(MainActivity.this, "You have no favorite movie added", Toast.LENGTH_SHORT).show();

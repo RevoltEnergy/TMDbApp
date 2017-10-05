@@ -17,10 +17,10 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
-import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
-import com.pk.tmdbapp.activities.DetailActivity;
+import com.github.ybq.android.spinkit.style.ThreeBounce;
 import com.pk.tmdbapp.R;
+import com.pk.tmdbapp.activities.DetailActivity;
 import com.pk.tmdbapp.mvp.model.MovieModel;
 
 import java.util.List;
@@ -68,9 +68,6 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MyViewHold
                                 return false;
                             }
                         })
-                /*.apply(new RequestOptions()
-                        .placeholder(R.drawable.load)
-                        .error(R.drawable.load))*/
                 .into(viewHolder.thumbnail);
     }
     @Override
@@ -84,6 +81,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MyViewHold
         TextView userRating;
         ImageView thumbnail;
         ProgressBar progressBar;
+        ThreeBounce threeBounce;
 
         MyViewHolder(View itemView) {
             super(itemView);
@@ -91,24 +89,23 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MyViewHold
             userRating = (TextView) itemView.findViewById(R.id.user_rating);
             thumbnail = (ImageView) itemView.findViewById(R.id.thumbnail);
             progressBar = (ProgressBar) itemView.findViewById(R.id.progress);
+            threeBounce = new ThreeBounce();
+            progressBar.setIndeterminateDrawable(threeBounce);
 
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    int position = getAdapterPosition();
-                    if (position != RecyclerView.NO_POSITION) {
-                        MovieModel clickedDataItem = movieList.get(position);
-                        Intent intent = new Intent(mContext, DetailActivity.class);
-                        intent.putExtra("title", movieList.get(position).getTitle());
-                        intent.putExtra("original_title", movieList.get(position).getOriginalTitle());
-                        intent.putExtra("poster_path", movieList.get(position).getPosterPath());
-                        intent.putExtra("overview", movieList.get(position).getOverview());
-                        intent.putExtra("vote_average", Double.toString(movieList.get(position).getVoteAverage()));
-                        intent.putExtra("release_date", movieList.get(position).getReleaseDate());
-                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        mContext.startActivity(intent);
-                        Toast.makeText(v.getContext(), "You clicked " + clickedDataItem.getOriginalTitle(), Toast.LENGTH_SHORT).show();
-                    }
+            itemView.setOnClickListener(v -> {
+                int position = getAdapterPosition();
+                if (position != RecyclerView.NO_POSITION) {
+                    MovieModel clickedDataItem = movieList.get(position);
+                    Intent intent = new Intent(mContext, DetailActivity.class);
+                    intent.putExtra("title", movieList.get(position).getTitle());
+                    intent.putExtra("original_title", movieList.get(position).getOriginalTitle());
+                    intent.putExtra("poster_path", movieList.get(position).getPosterPath());
+                    intent.putExtra("overview", movieList.get(position).getOverview());
+                    intent.putExtra("vote_average", Double.toString(movieList.get(position).getVoteAverage()));
+                    intent.putExtra("release_date", movieList.get(position).getReleaseDate());
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    mContext.startActivity(intent);
+                    Toast.makeText(v.getContext(), "You clicked " + clickedDataItem.getOriginalTitle(), Toast.LENGTH_SHORT).show();
                 }
             });
         }

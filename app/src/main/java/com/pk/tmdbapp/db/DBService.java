@@ -8,7 +8,6 @@ import java.util.List;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
-import io.reactivex.Observer;
 import io.realm.Realm;
 import io.realm.RealmObject;
 import io.realm.RealmResults;
@@ -21,31 +20,9 @@ public class DBService {
 
     public <T extends RealmObject> Observable<T> save(Realm realm, T object, Class<T> clazz) {
 
-        /*List<MovieModel> movieModels = realm.where(MovieModel.class).findAll();
-        for (MovieModel movie : movieModels) {
-            System.out.println("############################# " + movie.getOriginalTitle());
-        }*/
-
-        System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-        System.out.println(((RealmMovie) object).getTitle());
-        System.out.println(((RealmMovie) object).getOriginalTitle());
-        System.out.println(((RealmMovie) object).getPosterPath());
-        System.out.println(((RealmMovie) object).getOverview());
-        System.out.println(((RealmMovie) object).getReleaseDate());
-        System.out.println(((RealmMovie) object).getVoteAverage());
-        System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-
         RealmMovie movie = realm.where(RealmMovie.class).equalTo("title", ((RealmMovie) object).getTitle()).findFirst();
 
         if (movie != null) {
-            System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-            System.out.println(movie.getTitle());
-            System.out.println(movie.getOriginalTitle());
-            System.out.println(movie.getPosterPath());
-            System.out.println(movie.getOverview());
-            System.out.println(movie.getReleaseDate());
-            System.out.println(movie.getVoteAverage());
-            System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
             if (((RealmMovie) object).getTitle().equals(movie.getTitle())) {
                 return Observable.just(object).doOnSubscribe(disposable -> {});
             }

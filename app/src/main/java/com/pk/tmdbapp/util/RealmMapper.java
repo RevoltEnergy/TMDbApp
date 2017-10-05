@@ -30,6 +30,7 @@ public class RealmMapper {
         MovieModel movieModel = new MovieModel();
         movieModel.setPosterPath(realmMovie.getPosterPath());
         movieModel.setTitle(realmMovie.getTitle());
+        movieModel.setOriginalTitle(realmMovie.getOriginalTitle());
         movieModel.setVoteAverage(realmMovie.getVoteAverage());
         movieModel.setReleaseDate(realmMovie.getReleaseDate());
         movieModel.setOverview(realmMovie.getOverview());

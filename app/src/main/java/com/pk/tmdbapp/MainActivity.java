@@ -36,6 +36,7 @@ import com.pk.tmdbapp.util.RealmMapper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import javax.inject.Inject;
 
@@ -156,7 +157,8 @@ public class MainActivity extends AppCompatActivity
             listObservable
                     .subscribeOn(Schedulers.computation())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .timeout(15, TimeUnit.SECONDS)
+                    .timeout(15, TimeUnit.SECONDS, Observable.error(new TimeoutException()))
+                    .onErrorResumeNext(Observable.empty())
                     .doOnComplete(() -> {
                         recyclerView.setAdapter(new MoviesAdapter(getApplicationContext(), movies));
                         recyclerView.smoothScrollToPosition(0);
@@ -164,6 +166,11 @@ public class MainActivity extends AppCompatActivity
                             swipeContainer.setRefreshing(false);
                         }
                         progressDialog.dismiss();
+                        if (!CheckNetwork.isInternetAvailable(this)) {
+                            updateSortPreferences(
+                                    this.getString(R.string.pref_sort_order_key),
+                                    this.getString(R.string.pref_favorite));
+                        }
                     })
                     .doOnError(throwable -> {
                         Log.d("Error", throwable.getMessage());
@@ -196,7 +203,8 @@ public class MainActivity extends AppCompatActivity
             listObservable
                     .subscribeOn(Schedulers.computation())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .timeout(15, TimeUnit.SECONDS)
+                    .timeout(15, TimeUnit.SECONDS, Observable.error(new TimeoutException()))
+                    .onErrorResumeNext(Observable.empty())
                     .doOnComplete(() -> {
                         recyclerView.setAdapter(new MoviesAdapter(getApplicationContext(), movies));
                         recyclerView.smoothScrollToPosition(0);
@@ -204,6 +212,11 @@ public class MainActivity extends AppCompatActivity
                             swipeContainer.setRefreshing(false);
                         }
                         progressDialog.dismiss();
+                        if (!CheckNetwork.isInternetAvailable(this)) {
+                            updateSortPreferences(
+                                    this.getString(R.string.pref_sort_order_key),
+                                    this.getString(R.string.pref_favorite));
+                        }
                     })
                     .doOnError(throwable -> {
                         Log.d("Error", throwable.getMessage());
@@ -282,7 +295,6 @@ public class MainActivity extends AppCompatActivity
         editor.putString(key, value);
         editor.apply();
         editor.commit();
-        //checkSortOrder();
     }
 
     @Override

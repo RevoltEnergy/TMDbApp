@@ -19,7 +19,7 @@ public class NoInternetActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_no_internet);
-        //((TMDbApplication) getApplication()).getAppComponent().inject(this);
+        ((TMDbApplication) getApplication()).getAppComponent().inject(this);
 
         final Button button = (Button) findViewById(R.id.try_again);
         button.setOnClickListener(new View.OnClickListener() {

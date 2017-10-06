@@ -28,7 +28,7 @@ public class SettingsActivity extends PreferenceActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
-        //((TMDbApplication) getApplication()).getAppComponent().inject(this);
+        ((TMDbApplication) getApplication()).getAppComponent().inject(this);
 
         final Button button = (Button) findViewById(R.id.clear_favorite_button);
         button.setOnClickListener(v -> {

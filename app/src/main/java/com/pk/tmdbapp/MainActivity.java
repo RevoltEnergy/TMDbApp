@@ -40,6 +40,7 @@ import java.util.concurrent.TimeoutException;
 
 import javax.inject.Inject;
 
+import dagger.android.AndroidInjection;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
@@ -64,10 +65,11 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //AndroidInjection.inject(this);
         setContentView(R.layout.activity_main);
 
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        ((TMDbApplication) getApplication()).getAppComponent().inject(this);
+        //((TMDbApplication) getApplication()).getAppComponent().inject(this);
 
         if (!CheckNetwork.isInternetAvailable(this)) {
             updateSortPreferences(

@@ -8,6 +8,7 @@ import android.preference.PreferenceManager;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.pk.tmdbapp.MainActivity;
 import com.pk.tmdbapp.db.migration.RealmMovieMigration;
 
 import java.util.concurrent.TimeUnit;
@@ -16,6 +17,7 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
+import dagger.android.ContributesAndroidInjector;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 import okhttp3.Cache;
@@ -45,9 +47,9 @@ public class ApplicationModule {
 
     @Provides
     @Singleton
-    Cache provideOkHttpCache(Application application) {
+    Cache provideOkHttpCache(Context context) {
         int cacheSize = 10 * 1024 * 1024; // 10 MiB
-        return new Cache(application.getCacheDir(), cacheSize);
+        return new Cache(context.getCacheDir(), cacheSize);
     }
 
     @Provides
@@ -56,13 +58,13 @@ public class ApplicationModule {
         return GsonConverterFactory.create();
     }
 
-    @Provides
+    /*@Provides
     @Singleton
     Gson provideGson() {
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES);
         return gsonBuilder.create();
-    }
+    }*/
 
     @Provides
     @Singleton
@@ -82,16 +84,18 @@ public class ApplicationModule {
 
     @Provides
     @Singleton
-    Retrofit provideRetrofit(GsonConverterFactory factory, OkHttpClient okHttpClient) {
+    Retrofit provideRetrofit(GsonConverterFactory factory, OkHttpClient okHttpClient, RxJava2CallAdapterFactory adapterFactory) {
         final String BASE_URL = "http://api.themoviedb.org/3/";
         return new Retrofit.Builder()
                 .addConverterFactory(factory)
+                .addCallAdapterFactory(adapterFactory)
                 .baseUrl(BASE_URL)
                 .client(okHttpClient)
                 .build();
     }
 
     @Provides
+    @Singleton
     Realm provideRealm(Context context) {
         Realm.init(context);
         Realm.removeDefaultConfiguration();
@@ -106,6 +110,7 @@ public class ApplicationModule {
     }
 
     @Provides
+    @Singleton
     Context provideContext() {
         return mContext;
     }

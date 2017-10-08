@@ -91,6 +91,7 @@ public class ApplicationModule {
                 .build();
     }
 
+    @Singleton
     @Provides
     Realm provideRealm(Context context) {
         Realm.init(context);
@@ -105,6 +106,7 @@ public class ApplicationModule {
         return Realm.getDefaultInstance();
     }
 
+    @Singleton
     @Provides
     Context provideContext() {
         return mContext;

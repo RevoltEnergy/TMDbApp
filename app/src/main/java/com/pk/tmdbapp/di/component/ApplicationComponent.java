@@ -8,13 +8,15 @@ import com.pk.tmdbapp.application.TMDbApplication;
 import com.pk.tmdbapp.di.module.ApplicationModule;
 import com.pk.tmdbapp.di.scope.PerApplication;
 
+import javax.inject.Singleton;
+
 import dagger.Component;
 
 /**
  * Created by ace on 10/04/2017.
  */
 
-@PerApplication
+@Singleton
 @Component(modules = ApplicationModule.class)
 public interface ApplicationComponent {
 

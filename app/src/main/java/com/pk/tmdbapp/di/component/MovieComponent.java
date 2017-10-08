@@ -13,5 +13,4 @@ import dagger.Component;
 @Component(modules = MovieModule.class, dependencies = ApplicationComponent.class)
 public interface MovieComponent {
 
-
 }

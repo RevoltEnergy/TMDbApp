@@ -1,5 +1,7 @@
 package com.pk.tmdbapp.di.component;
 
+import android.app.Application;
+
 import com.pk.tmdbapp.MainActivity;
 import com.pk.tmdbapp.activities.DetailActivity;
 import com.pk.tmdbapp.activities.NoInternetActivity;

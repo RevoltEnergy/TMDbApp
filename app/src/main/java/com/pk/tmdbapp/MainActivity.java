@@ -44,15 +44,16 @@ import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import io.realm.Realm;
+import retrofit2.Retrofit;
 
 public class MainActivity extends AppCompatActivity
         implements SharedPreferences.OnSharedPreferenceChangeListener, MainView {
 
-    private SharedPreferences preferences;
     private boolean favorite_menu = false;
 
+    @Inject protected SharedPreferences preferences;
     @Inject protected Realm mRealm;
-    //@Inject protected Retrofit mRetrofit;
+    @Inject protected Retrofit mRetrofit;
 
     private RecyclerView recyclerView;
     private MoviesAdapter adapter;
@@ -66,7 +67,6 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        preferences = PreferenceManager.getDefaultSharedPreferences(this);
         ((TMDbApplication) getApplication()).getAppComponent().inject(this);
 
         if (!CheckNetwork.isInternetAvailable(this)) {
@@ -150,8 +150,7 @@ public class MainActivity extends AppCompatActivity
                 return;
             }
 
-            MovieAPIService apiMovieService = Client.getClient().create(MovieAPIService.class);
-            //MovieAPIService apiMovieService = mRetrofit.create(MovieAPIService.class);
+            MovieAPIService apiMovieService = mRetrofit.create(MovieAPIService.class);
             Observable<MoviesResponse> listObservable = apiMovieService.getPopularMoviesObs(BuildConfig.TMDB_API_KEY);
             List<MovieModel> movies = new ArrayList<>();
             listObservable
@@ -196,8 +195,7 @@ public class MainActivity extends AppCompatActivity
                 return;
             }
 
-            MovieAPIService apiMovieService = Client.getClient().create(MovieAPIService.class);
-
+            MovieAPIService apiMovieService = mRetrofit.create(MovieAPIService.class);
             Observable<MoviesResponse> listObservable = apiMovieService.getTopRatedMoviesObs(BuildConfig.TMDB_API_KEY);
             List<MovieModel> movies = new ArrayList<>();
             listObservable

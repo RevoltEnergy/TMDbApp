@@ -39,15 +39,15 @@ public class ApplicationModule {
 
     @Provides
     @Singleton
-    SharedPreferences providesSharedPreferences(Application application) {
-        return PreferenceManager.getDefaultSharedPreferences(application);
+    SharedPreferences providesSharedPreferences(Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context);
     }
 
     @Provides
     @Singleton
-    Cache provideOkHttpCache(Application application) {
+    Cache provideOkHttpCache(Context context) {
         int cacheSize = 10 * 1024 * 1024; // 10 MiB
-        return new Cache(application.getCacheDir(), cacheSize);
+        return new Cache(context.getCacheDir(), cacheSize);
     }
 
     @Provides
@@ -82,16 +82,17 @@ public class ApplicationModule {
 
     @Provides
     @Singleton
-    Retrofit provideRetrofit(GsonConverterFactory factory, OkHttpClient okHttpClient) {
+    Retrofit provideRetrofit(GsonConverterFactory factory, OkHttpClient okHttpClient, RxJava2CallAdapterFactory adapterFactory) {
         final String BASE_URL = "http://api.themoviedb.org/3/";
         return new Retrofit.Builder()
-                .addConverterFactory(factory)
                 .baseUrl(BASE_URL)
+                .addConverterFactory(factory)
+                .addCallAdapterFactory(adapterFactory)
                 .client(okHttpClient)
                 .build();
     }
 
-    @Singleton
+    //@Singleton
     @Provides
     Realm provideRealm(Context context) {
         Realm.init(context);
@@ -111,4 +112,10 @@ public class ApplicationModule {
     Context provideContext() {
         return mContext;
     }
+
+    /*@Singleton
+    @Provides
+    Application provideApplication() {
+        return (Application) mContext;
+    }*/
 }

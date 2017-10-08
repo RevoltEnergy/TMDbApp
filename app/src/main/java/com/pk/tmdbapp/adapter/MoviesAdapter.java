@@ -20,7 +20,7 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.github.ybq.android.spinkit.style.ThreeBounce;
 import com.pk.tmdbapp.R;
-import com.pk.tmdbapp.activities.DetailActivity;
+import com.pk.tmdbapp.mvp.view.activities.DetailActivity;
 import com.pk.tmdbapp.mvp.model.MovieModel;
 
 import java.util.List;

@@ -1,6 +1,6 @@
-package com.pk.tmdbapp.activities;
+package com.pk.tmdbapp.mvp.presenter;
 
-import com.pk.tmdbapp.mvp.view.MainView;
+import com.pk.tmdbapp.mvp.view.main.MainView;
 
 import javax.inject.Inject;
 

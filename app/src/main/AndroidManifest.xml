@@ -12,7 +12,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
+        <activity android:name=".mvp.view.main.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -20,20 +20,20 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activities.DetailActivity"
+            android:name=".mvp.view.activities.DetailActivity"
             android:label="Movies"
-            android:parentActivityName=".MainActivity"
+            android:parentActivityName=".mvp.view.main.MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.pk.tmdbapp.MainActivity" />
+                android:value="com.pk.tmdbapp.mvp.view.main.MainActivity" />
         </activity>
         <activity
-            android:name=".activities.SettingsActivity"
+            android:name=".mvp.view.activities.SettingsActivity"
             android:label="Settings">
         </activity>
         <activity
-            android:name=".activities.NoInternetActivity"
+            android:name=".mvp.view.activities.NoInternetActivity"
             android:label="No Internet">
         </activity>
     </application>

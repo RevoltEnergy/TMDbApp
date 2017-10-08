@@ -2,7 +2,7 @@ package com.pk.tmdbapp.di.module;
 
 import android.content.Context;
 
-import com.pk.tmdbapp.MainActivity;
+import com.pk.tmdbapp.mvp.view.main.MainActivity;
 import com.pk.tmdbapp.di.qualifier.ActivityContext;
 import com.pk.tmdbapp.di.scope.PerActivity;
 

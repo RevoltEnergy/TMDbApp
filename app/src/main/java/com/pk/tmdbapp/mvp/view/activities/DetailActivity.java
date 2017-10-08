@@ -1,4 +1,4 @@
-package com.pk.tmdbapp.activities;
+package com.pk.tmdbapp.mvp.view.activities;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -123,7 +123,7 @@ public class DetailActivity extends AppCompatActivity {
 
         materialFavoriteButton.setOnFavoriteChangeListener(new MaterialFavoriteButton.OnFavoriteChangeListener() {
             SharedPreferences.Editor editor =
-                    getSharedPreferences("com.pk.tmdbapp.activities.DetailActivity", MODE_PRIVATE).edit();
+                    getSharedPreferences("com.pk.tmdbapp.mvp.view.activities.DetailActivity", MODE_PRIVATE).edit();
             @Override
             public void onFavoriteChanged(MaterialFavoriteButton buttonView, boolean favorite) {
 

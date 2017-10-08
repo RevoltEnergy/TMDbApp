@@ -1,8 +1,5 @@
 package com.pk.tmdbapp.di.component;
 
-import com.pk.tmdbapp.MainActivity;
-import com.pk.tmdbapp.activities.DetailActivity;
-import com.pk.tmdbapp.activities.SettingsActivity;
 import com.pk.tmdbapp.di.module.ActivityModule;
 import com.pk.tmdbapp.di.scope.PerActivity;
 

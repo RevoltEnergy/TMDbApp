@@ -1,4 +1,4 @@
-package com.pk.tmdbapp;
+package com.pk.tmdbapp.mvp.view.main;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -18,18 +18,17 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.pk.tmdbapp.activities.NoInternetActivity;
-import com.pk.tmdbapp.activities.SettingsActivity;
+import com.pk.tmdbapp.BuildConfig;
+import com.pk.tmdbapp.R;
+import com.pk.tmdbapp.mvp.view.activities.NoInternetActivity;
+import com.pk.tmdbapp.mvp.view.activities.SettingsActivity;
 import com.pk.tmdbapp.adapter.MoviesAdapter;
 import com.pk.tmdbapp.api.MovieAPIService;
 import com.pk.tmdbapp.application.TMDbApplication;
 import com.pk.tmdbapp.db.DBService;
 import com.pk.tmdbapp.db.realmmodel.RealmMovie;
-import com.pk.tmdbapp.di.component.DaggerMovieComponent;
-import com.pk.tmdbapp.di.module.MovieModule;
 import com.pk.tmdbapp.mvp.model.MovieModel;
 import com.pk.tmdbapp.mvp.model.MoviesResponse;
-import com.pk.tmdbapp.mvp.view.MainView;
 import com.pk.tmdbapp.util.CheckNetwork;
 import com.pk.tmdbapp.util.RealmMapper;
 

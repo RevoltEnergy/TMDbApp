@@ -1,11 +1,7 @@
 package com.pk.tmdbapp.di.component;
 
-import com.pk.tmdbapp.MainActivity;
-import com.pk.tmdbapp.api.MovieAPIService;
 import com.pk.tmdbapp.di.module.MovieModule;
 import com.pk.tmdbapp.di.scope.PerActivity;
-
-import javax.inject.Singleton;
 
 import dagger.Component;
 

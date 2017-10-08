@@ -1,13 +1,12 @@
-package com.pk.tmdbapp.activities;
+package com.pk.tmdbapp.mvp.view.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.support.annotation.Nullable;
 import android.widget.Button;
-import android.widget.ListView;
 
-import com.pk.tmdbapp.MainActivity;
+import com.pk.tmdbapp.mvp.view.main.MainActivity;
 import com.pk.tmdbapp.R;
 import com.pk.tmdbapp.application.TMDbApplication;
 import com.pk.tmdbapp.db.DBService;

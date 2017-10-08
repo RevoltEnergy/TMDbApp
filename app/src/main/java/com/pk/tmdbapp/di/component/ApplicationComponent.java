@@ -1,16 +1,13 @@
 package com.pk.tmdbapp.di.component;
 
-import android.app.Application;
 import android.content.SharedPreferences;
 
-import com.pk.tmdbapp.MainActivity;
-import com.pk.tmdbapp.activities.DetailActivity;
-import com.pk.tmdbapp.activities.NoInternetActivity;
-import com.pk.tmdbapp.activities.SettingsActivity;
-import com.pk.tmdbapp.api.MovieAPIService;
+import com.pk.tmdbapp.mvp.view.main.MainActivity;
+import com.pk.tmdbapp.mvp.view.activities.DetailActivity;
+import com.pk.tmdbapp.mvp.view.activities.NoInternetActivity;
+import com.pk.tmdbapp.mvp.view.activities.SettingsActivity;
 import com.pk.tmdbapp.application.TMDbApplication;
 import com.pk.tmdbapp.di.module.ApplicationModule;
-import com.pk.tmdbapp.di.scope.PerApplication;
 
 import javax.inject.Singleton;
 

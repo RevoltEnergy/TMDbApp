@@ -8,7 +8,11 @@ import android.preference.PreferenceManager;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.pk.tmdbapp.api.MovieAPIService;
+import com.pk.tmdbapp.db.DBService;
 import com.pk.tmdbapp.db.migration.RealmMovieMigration;
+import com.pk.tmdbapp.di.scope.PerActivity;
+import com.pk.tmdbapp.di.scope.PerApplication;
 
 import java.util.concurrent.TimeUnit;
 
@@ -92,7 +96,6 @@ public class ApplicationModule {
                 .build();
     }
 
-    //@Singleton
     @Provides
     Realm provideRealm(Context context) {
         Realm.init(context);
@@ -113,9 +116,15 @@ public class ApplicationModule {
         return mContext;
     }
 
-    /*@Singleton
+    @Singleton
     @Provides
-    Application provideApplication() {
-        return (Application) mContext;
-    }*/
+    MovieAPIService provideMovieAPIService(Retrofit retrofit){
+        return retrofit.create(MovieAPIService.class);
+    }
+
+    @Singleton
+    @Provides
+    DBService providesDBService() {
+        return new DBService();
+    }
 }

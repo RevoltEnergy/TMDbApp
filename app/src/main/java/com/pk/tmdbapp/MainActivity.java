@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -22,11 +21,12 @@ import android.widget.Toast;
 import com.pk.tmdbapp.activities.NoInternetActivity;
 import com.pk.tmdbapp.activities.SettingsActivity;
 import com.pk.tmdbapp.adapter.MoviesAdapter;
-import com.pk.tmdbapp.api.Client;
 import com.pk.tmdbapp.api.MovieAPIService;
 import com.pk.tmdbapp.application.TMDbApplication;
 import com.pk.tmdbapp.db.DBService;
 import com.pk.tmdbapp.db.realmmodel.RealmMovie;
+import com.pk.tmdbapp.di.component.DaggerMovieComponent;
+import com.pk.tmdbapp.di.module.MovieModule;
 import com.pk.tmdbapp.mvp.model.MovieModel;
 import com.pk.tmdbapp.mvp.model.MoviesResponse;
 import com.pk.tmdbapp.mvp.view.MainView;
@@ -51,6 +51,8 @@ public class MainActivity extends AppCompatActivity
 
     private boolean favorite_menu = false;
 
+    @Inject protected MovieAPIService movieAPIService;
+    @Inject protected DBService dbService;
     @Inject protected SharedPreferences preferences;
     @Inject protected Realm mRealm;
     @Inject protected Retrofit mRetrofit;
@@ -69,6 +71,8 @@ public class MainActivity extends AppCompatActivity
 
         ((TMDbApplication) getApplication()).getAppComponent().inject(this);
 
+        //resolveDaggerDependency();
+
         if (!CheckNetwork.isInternetAvailable(this)) {
             updateSortPreferences(
                     this.getString(R.string.pref_sort_order_key),
@@ -76,6 +80,15 @@ public class MainActivity extends AppCompatActivity
         }
         initViews();
     }
+
+    /*protected void resolveDaggerDependency() {
+        DaggerMovieComponent.builder()
+                .applicationComponent(((TMDbApplication) getApplication()).getAppComponent())
+                .movieModule(new MovieModule())
+                .build()
+                .inject(this)
+        ;
+    }*/
 
     private void initViews() {
 
@@ -110,8 +123,6 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void loadFavoriteMovies() {
-
-        DBService dbService = new DBService();
 
         List<MovieModel> movies = new ArrayList<>();
 
@@ -150,8 +161,8 @@ public class MainActivity extends AppCompatActivity
                 return;
             }
 
-            MovieAPIService apiMovieService = mRetrofit.create(MovieAPIService.class);
-            Observable<MoviesResponse> listObservable = apiMovieService.getPopularMoviesObs(BuildConfig.TMDB_API_KEY);
+            movieAPIService = mRetrofit.create(MovieAPIService.class);
+            Observable<MoviesResponse> listObservable = movieAPIService.getPopularMoviesObs(BuildConfig.TMDB_API_KEY);
             List<MovieModel> movies = new ArrayList<>();
             listObservable
                     .subscribeOn(Schedulers.computation())
@@ -195,8 +206,8 @@ public class MainActivity extends AppCompatActivity
                 return;
             }
 
-            MovieAPIService apiMovieService = mRetrofit.create(MovieAPIService.class);
-            Observable<MoviesResponse> listObservable = apiMovieService.getTopRatedMoviesObs(BuildConfig.TMDB_API_KEY);
+            movieAPIService = mRetrofit.create(MovieAPIService.class);
+            Observable<MoviesResponse> listObservable = movieAPIService.getTopRatedMoviesObs(BuildConfig.TMDB_API_KEY);
             List<MovieModel> movies = new ArrayList<>();
             listObservable
                     .subscribeOn(Schedulers.computation())

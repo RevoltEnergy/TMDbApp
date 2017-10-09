@@ -13,6 +13,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
@@ -42,13 +43,15 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doCallRealMethod;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
 
 import static org.powermock.api.mockito.PowerMockito.doNothing;
 import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 import static org.powermock.api.mockito.PowerMockito.verifyStatic;
+import static org.powermock.api.mockito.PowerMockito.when;
 import static org.powermock.api.mockito.PowerMockito.whenNew;
 
 /**
@@ -85,7 +88,9 @@ public class DBServiceTest {
         mockStatic(RealmConfiguration.class);
         Realm.init(RuntimeEnvironment.application);
 
-        final Realm mockRealm = mock(Realm.class);
+        //final Realm mockRealm = mock(Realm.class);
+        //Realm mockRealm = PowerMockito.mock(Realm.class);
+        Realm mockRealm = PowerMockito.mock(Realm.class);
         final RealmConfiguration mockRealmConfig = mock(RealmConfiguration.class);
 
         doNothing().when(RealmCore.class);
@@ -140,6 +145,8 @@ public class DBServiceTest {
                 new RealmConfiguration.Builder().inMemory().name("test-mockRealm").build();
         mockRealm = Realm.getInstance(config);*/
 
+        when(Realm.getDefaultInstance()).thenReturn(mockRealm);
+
         this.mockRealm = mockRealm;
         this.realmMovies = realmMovies;
     }
@@ -157,15 +164,56 @@ public class DBServiceTest {
     }
 
     @Test
+    public void shouldBeAbleToMockRealmMethods() {
+        when(mockRealm.isAutoRefresh()).thenReturn(true);
+        assertThat(mockRealm.isAutoRefresh(), is(true));
+
+        when(mockRealm.isAutoRefresh()).thenReturn(false);
+        assertThat(mockRealm.isAutoRefresh(), is(false));
+    }
+
+    @Test
+    public void shouldBeAbleToCreateARealmObject() {
+        RealmMovie movie = new RealmMovie();
+
+        when(mockRealm.createObject(RealmMovie.class)).thenReturn(movie);
+
+        RealmMovie output = mockRealm.createObject(RealmMovie.class);
+
+        assertThat(output, is(movie));
+    }
+
+    @Test
+    public void shouldVerifyThatObjectWasCreated() {
+
+        mockRealm = Mockito.mock(Realm.class);
+
+        doCallRealMethod().when(mockRealm).executeTransaction(Mockito.any(Realm.Transaction.class));
+
+        RealmMovie movie = Mockito.mock(RealmMovie.class);
+        when(mockRealm.createObject(RealmMovie.class)).thenReturn(movie);
+
+/*
+        // Verify that Realm#createObject was called only once
+        verify(mockRealm, times(1)).createObject(Dog.class); // Verify that a Dog was in fact created.
+
+        // Verify that Dog#setName() is called only once
+        verify(movie, times(1)).setName(Mockito.anyString()); // Any string will do
+
+        // Verify that the Realm was closed only once.
+        verify(mockRealm, times(1)).close();*/
+    }
+
+    @Test
     public void save() throws Exception {
-        this.mockRealm = Realm.getDefaultInstance();
+        mockRealm = Mockito.mock(Realm.class);
         this.dbService = new DBService(mockRealm);
 
-        //doCallRealMethod().when(mockRealm).executeTransaction(Mockito.any(Realm.Transaction.class));
+        doCallRealMethod().when(mockRealm).executeTransaction(Mockito.any(Realm.Transaction.class));
 
         // Verify that two Realm.getInstance() calls took place.
-        verifyStatic(times(1));
-        Realm.getDefaultInstance();
+        /*verifyStatic(times(1));
+        Realm.getDefaultInstance();*/
 
         /*when(dbService.save(any(RealmMovie.class), RealmMovie.class))
                 .thenAnswer(invocationOnMock -> {
@@ -177,8 +225,12 @@ public class DBServiceTest {
 
     @Test
     public void remove() throws Exception {
-        /*when(dbService.remove(mockRealm, Mockito.any(RealmMovie.class)))
-                .thenAnswer(invocationOnMock -> movies.get(invocationOnMock.getArgument(0)));*/
+        mockRealm = Mockito.mock(Realm.class);
+        this.dbService = new DBService(mockRealm);
+
+        doCallRealMethod().when(mockRealm).executeTransaction(Mockito.any(Realm.Transaction.class));
+        //when(dbService.remove(Mockito.any(RealmMovie.class)))
+          //      .thenAnswer(invocationOnMock -> movies.get(/*invocationOnMock.getArguments()*/ 0));
     }
 
     @Test
@@ -203,7 +255,7 @@ public class DBServiceTest {
 
     @After
     public void tearDown() throws Exception {
-        mockRealm.close();
+        //mockRealm.close();
     }
 
     @AfterClass

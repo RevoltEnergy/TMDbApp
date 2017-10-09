@@ -57,15 +57,6 @@ public class DetailPresenterTest {
     public static void setUpClass() {
 
         // Override the default "out of the box" AndroidSchedulers.mainThread() Scheduler
-        //
-        // This is necessary here because otherwise if the static initialization block in AndroidSchedulers
-        // is executed before this, then the Android SDK dependent version will be provided instead.
-        //
-        // This would cause a java.lang.ExceptionInInitializerError when running the test as a
-        // Java JUnit test as any attempt to resolve the default underlying implementation of the
-        // AndroidSchedulers.mainThread() will fail as it relies on unavailable Android dependencies.
-
-        // Comment out this line to see the java.lang.ExceptionInInitializerError
         RxAndroidPlugins.setInitMainThreadSchedulerHandler(__ -> Schedulers.trampoline());
     }
 

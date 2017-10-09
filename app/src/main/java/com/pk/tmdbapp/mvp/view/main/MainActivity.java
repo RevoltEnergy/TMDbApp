@@ -20,31 +20,22 @@ import android.widget.Toast;
 
 import com.pk.tmdbapp.BuildConfig;
 import com.pk.tmdbapp.R;
-import com.pk.tmdbapp.di.component.DaggerMovieComponent;
-import com.pk.tmdbapp.di.module.MovieModule;
-import com.pk.tmdbapp.mvp.presenter.MainPresenter;
-import com.pk.tmdbapp.mvp.view.activities.NoInternetActivity;
-import com.pk.tmdbapp.mvp.view.activities.SettingsActivity;
 import com.pk.tmdbapp.adapter.MoviesAdapter;
 import com.pk.tmdbapp.api.MovieAPIService;
 import com.pk.tmdbapp.application.TMDbApplication;
 import com.pk.tmdbapp.db.DBService;
-import com.pk.tmdbapp.db.realmmodel.RealmMovie;
+import com.pk.tmdbapp.di.component.DaggerMovieComponent;
+import com.pk.tmdbapp.di.module.MovieModule;
 import com.pk.tmdbapp.mvp.model.MovieModel;
-import com.pk.tmdbapp.mvp.model.MoviesResponse;
+import com.pk.tmdbapp.mvp.presenter.MainPresenter;
+import com.pk.tmdbapp.mvp.view.activities.SettingsActivity;
 import com.pk.tmdbapp.util.CheckNetwork;
-import com.pk.tmdbapp.util.RealmMapper;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import javax.inject.Inject;
 
-import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.schedulers.Schedulers;
 import io.realm.Realm;
 import retrofit2.Retrofit;
 

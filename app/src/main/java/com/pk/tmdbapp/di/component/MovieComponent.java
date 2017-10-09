@@ -18,5 +18,4 @@ import dagger.Component;
 public interface MovieComponent {
 
     void inject(MainActivity activity);
-    //void inject(DetailActivity activity);
 }

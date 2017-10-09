@@ -46,8 +46,6 @@ import io.realm.Realm;
 
 public class DetailActivity extends AppCompatActivity implements DetailView {
 
-    @Inject Realm mRealm;
-    @Inject DBService dbService;
     @Inject DetailPresenter detailPresenter;
 
     TextView nameOfMovie;
@@ -58,22 +56,12 @@ public class DetailActivity extends AppCompatActivity implements DetailView {
     ProgressBar progressBar;
     ThreeBounce threeBounce;
 
-    protected void resolveDaggerDependency() {
-        DaggerDetailComponent.builder()
-                .applicationComponent(((TMDbApplication) getApplication()).getAppComponent())
-                .detailModule(new DetailModule(this))
-                .build()
-                .inject(this)
-        ;
-    }
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        //((TMDbApplication) getApplication()).getAppComponent().inject(this);
         resolveDaggerDependency();
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -147,28 +135,14 @@ public class DetailActivity extends AppCompatActivity implements DetailView {
                     editor.putBoolean("Favorite Added", true);
                     editor.apply();
                     detailPresenter.saveFavorite(movieModel);
-                    //saveFavorite(dbService, movieModel);
-                    //Snackbar.make(buttonView, "Added to Favorite", Snackbar.LENGTH_SHORT).show();
                 } else {
                     editor.putBoolean("Favorite Removed", true);
                     editor.apply();
                     detailPresenter.removeFavorite(movieModel);
-                    //removeFavorite(dbService, movieModel);
-                    //Snackbar.make(buttonView, "Removed from Favorite", Snackbar.LENGTH_SHORT).show();
                 }
             }
         });
 
-    }
-
-    private void removeFavorite(DBService dbService, MovieModel movieModel) {
-        dbService.remove(mRealm, RealmMapper.mapToRealmMovie(movieModel))
-                .subscribe(movieModelConsumer -> Toast.makeText(getBaseContext(), "Removed", Toast.LENGTH_SHORT).show());
-    }
-
-    private void saveFavorite(DBService dbService, MovieModel movieModel) {
-        dbService.save(mRealm, RealmMapper.mapToRealmMovie(movieModel), RealmMovie.class)
-                .subscribe(movieModelConsumer -> Toast.makeText(getBaseContext(), "Saved", Toast.LENGTH_SHORT).show());
     }
 
     private void initCollapsingToolbar() {
@@ -196,6 +170,15 @@ public class DetailActivity extends AppCompatActivity implements DetailView {
                 }
             }
         });
+    }
+
+    protected void resolveDaggerDependency() {
+        DaggerDetailComponent.builder()
+                .applicationComponent(((TMDbApplication) getApplication()).getAppComponent())
+                .detailModule(new DetailModule(this))
+                .build()
+                .inject(this)
+        ;
     }
 
     @Override

@@ -1,6 +1,5 @@
 package com.pk.tmdbapp.di.module;
 
-import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
@@ -8,13 +7,8 @@ import android.preference.PreferenceManager;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.pk.tmdbapp.api.MovieAPIService;
 import com.pk.tmdbapp.db.DBService;
 import com.pk.tmdbapp.db.migration.RealmMovieMigration;
-import com.pk.tmdbapp.di.scope.PerActivity;
-import com.pk.tmdbapp.di.scope.PerApplication;
-import com.pk.tmdbapp.mvp.presenter.MainPresenter;
-import com.pk.tmdbapp.mvp.view.main.MainView;
 
 import java.util.concurrent.TimeUnit;
 
@@ -118,20 +112,9 @@ public class ApplicationModule {
         return mContext;
     }
 
-    /*@Singleton
-    @Provides
-    MovieAPIService provideMovieAPIService(Retrofit retrofit){
-        return retrofit.create(MovieAPIService.class);
-    }*/
-
     @Singleton
     @Provides
     DBService provideDBService() {
         return new DBService();
     }
-
-    /*@Provides
-    MainPresenter provideMainPresenter() {
-        return new MainPresenter(mainView, movieAPIService, retrofit, realm);
-    }*/
 }

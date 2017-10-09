@@ -1,7 +1,5 @@
 package com.pk.tmdbapp.mvp.presenter;
 
-import android.widget.Toast;
-
 import com.pk.tmdbapp.db.DBService;
 import com.pk.tmdbapp.db.realmmodel.RealmMovie;
 import com.pk.tmdbapp.mvp.model.MovieModel;

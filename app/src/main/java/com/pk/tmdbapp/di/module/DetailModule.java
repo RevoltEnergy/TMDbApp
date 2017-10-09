@@ -19,7 +19,7 @@ public class DetailModule {
         this.detailView = detailView;
     }
 
-    //@PerActivity
+    @PerActivity
     @Provides
     DetailView provideDetailView() {
         return detailView;

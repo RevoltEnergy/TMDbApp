@@ -16,6 +16,5 @@ import dagger.Component;
 @Component(modules = DetailModule.class, dependencies = ApplicationComponent.class)
 public interface DetailComponent {
 
-    //void inject(MainActivity activity);
     void inject(DetailActivity activity);
 }

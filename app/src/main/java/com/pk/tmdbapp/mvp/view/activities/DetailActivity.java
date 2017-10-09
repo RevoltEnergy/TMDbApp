@@ -41,6 +41,7 @@ import io.realm.Realm;
 public class DetailActivity extends AppCompatActivity {
 
     @Inject Realm mRealm;
+    @Inject DBService dbService;
 
     TextView nameOfMovie;
     TextView plotSynopsis;
@@ -61,8 +62,6 @@ public class DetailActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         initCollapsingToolbar();
-
-        DBService dbService = new DBService();
 
         MovieModel movieModel = new MovieModel();
 

@@ -13,6 +13,7 @@ import com.pk.tmdbapp.db.DBService;
 import com.pk.tmdbapp.db.migration.RealmMovieMigration;
 import com.pk.tmdbapp.di.scope.PerActivity;
 import com.pk.tmdbapp.di.scope.PerApplication;
+import com.pk.tmdbapp.mvp.presenter.MainPresenter;
 
 import java.util.concurrent.TimeUnit;
 
@@ -124,7 +125,13 @@ public class ApplicationModule {
 
     @Singleton
     @Provides
-    DBService providesDBService() {
+    DBService provideDBService() {
         return new DBService();
+    }
+
+    @Singleton
+    @Provides
+    MainPresenter provideMainPresenter() {
+        return new MainPresenter();
     }
 }

@@ -20,6 +20,9 @@ import android.widget.Toast;
 
 import com.pk.tmdbapp.BuildConfig;
 import com.pk.tmdbapp.R;
+import com.pk.tmdbapp.di.component.DaggerMovieComponent;
+import com.pk.tmdbapp.di.module.MovieModule;
+import com.pk.tmdbapp.mvp.presenter.MainPresenter;
 import com.pk.tmdbapp.mvp.view.activities.NoInternetActivity;
 import com.pk.tmdbapp.mvp.view.activities.SettingsActivity;
 import com.pk.tmdbapp.adapter.MoviesAdapter;
@@ -56,6 +59,8 @@ public class MainActivity extends AppCompatActivity
     @Inject protected Realm mRealm;
     @Inject protected Retrofit mRetrofit;
 
+    @Inject protected MainPresenter mainPresenter;
+
     private RecyclerView recyclerView;
     private MoviesAdapter adapter;
     private List<MovieModel> movieList;
@@ -70,7 +75,7 @@ public class MainActivity extends AppCompatActivity
 
         ((TMDbApplication) getApplication()).getAppComponent().inject(this);
 
-        //resolveDaggerDependency();
+        resolveDaggerDependency();
 
         if (!CheckNetwork.isInternetAvailable(this)) {
             updateSortPreferences(
@@ -80,14 +85,14 @@ public class MainActivity extends AppCompatActivity
         initViews();
     }
 
-    /*protected void resolveDaggerDependency() {
+    protected void resolveDaggerDependency() {
         DaggerMovieComponent.builder()
                 .applicationComponent(((TMDbApplication) getApplication()).getAppComponent())
-                .movieModule(new MovieModule())
+                .movieModule(new MovieModule(this))
                 .build()
-                .inject(this)
+                //.inject(this)
         ;
-    }*/
+    }
 
     private void initViews() {
 
@@ -168,26 +173,8 @@ public class MainActivity extends AppCompatActivity
                     .observeOn(AndroidSchedulers.mainThread())
                     .timeout(15, TimeUnit.SECONDS, Observable.error(new TimeoutException()))
                     .onErrorResumeNext(Observable.empty())
-                    .doOnComplete(() -> {
-                        recyclerView.setAdapter(new MoviesAdapter(getApplicationContext(), movies));
-                        recyclerView.smoothScrollToPosition(0);
-                        if (swipeContainer.isRefreshing()) {
-                            swipeContainer.setRefreshing(false);
-                        }
-                        progressDialog.dismiss();
-                        if (!CheckNetwork.isInternetAvailable(this)) {
-                            updateSortPreferences(
-                                    this.getString(R.string.pref_sort_order_key),
-                                    this.getString(R.string.pref_favorite));
-                        }
-                    })
-                    .doOnError(throwable -> {
-                        Log.d("Error", throwable.getMessage());
-                        Toast.makeText(MainActivity.this, "Error Fetching Data", Toast.LENGTH_SHORT).show();
-                        updateSortPreferences(
-                                getApplication().getString(R.string.pref_sort_order_key),
-                                getApplication().getString(R.string.pref_favorite));
-                    })
+                    .doOnComplete(() -> doOnRetrofitComplete(movies))
+                    .doOnError(this::doOnRetrofitError)
                     .subscribe(moviesResponse -> movies.addAll(moviesResponse.getResults()));
         } catch (Exception e) {
             Log.d("Error", e.getMessage());
@@ -213,32 +200,40 @@ public class MainActivity extends AppCompatActivity
                     .observeOn(AndroidSchedulers.mainThread())
                     .timeout(15, TimeUnit.SECONDS, Observable.error(new TimeoutException()))
                     .onErrorResumeNext(Observable.empty())
-                    .doOnComplete(() -> {
-                        recyclerView.setAdapter(new MoviesAdapter(getApplicationContext(), movies));
-                        recyclerView.smoothScrollToPosition(0);
-                        if (swipeContainer.isRefreshing()) {
-                            swipeContainer.setRefreshing(false);
-                        }
-                        progressDialog.dismiss();
-                        if (!CheckNetwork.isInternetAvailable(this)) {
-                            updateSortPreferences(
-                                    this.getString(R.string.pref_sort_order_key),
-                                    this.getString(R.string.pref_favorite));
-                        }
-                    })
-                    .doOnError(throwable -> {
-                        Log.d("Error", throwable.getMessage());
-                        Toast.makeText(MainActivity.this, "Error Fetching Data", Toast.LENGTH_SHORT).show();
-                        updateSortPreferences(
-                                getApplication().getString(R.string.pref_sort_order_key),
-                                getApplication().getString(R.string.pref_favorite));
-                    })
+                    .doOnComplete(() -> doOnRetrofitComplete(movies))
+                    .doOnError(this::doOnRetrofitError)
                     .subscribe(moviesResponse -> movies.addAll(moviesResponse.getResults()));
         } catch (Exception e) {
             Log.d("Error", e.getMessage());
             Toast.makeText(this, e.toString(), Toast.LENGTH_SHORT).show();
         }
         Toast.makeText(MainActivity.this, "Top Rated Movies", Toast.LENGTH_SHORT).show();
+    }
+
+    public void doOnRetrofitComplete(List<MovieModel> movies) {
+        recyclerView.setAdapter(new MoviesAdapter(getApplicationContext(), movies));
+        recyclerView.smoothScrollToPosition(0);
+        if (swipeContainer.isRefreshing()) {
+            swipeContainer.setRefreshing(false);
+        }
+        progressDialog.dismiss();
+        if (!CheckNetwork.isInternetAvailable(this)) {
+            updateSortPreferences(
+                    this.getString(R.string.pref_sort_order_key),
+                    this.getString(R.string.pref_favorite));
+        }
+    }
+
+    public void doOnRetrofitError(Throwable throwable) {
+        Log.d("Error", throwable.getMessage());
+        Toast.makeText(MainActivity.this, "Error Fetching Data", Toast.LENGTH_SHORT).show();
+        updateSortPreferences(
+                getApplication().getString(R.string.pref_sort_order_key),
+                getApplication().getString(R.string.pref_favorite));
+    }
+
+    public void onShowToast(String message) {
+        Toast.makeText(MainActivity.this, message, Toast.LENGTH_SHORT).show();
     }
 
     public Activity getActivity() {

@@ -2,6 +2,7 @@ package com.pk.tmdbapp.di.component;
 
 import android.content.SharedPreferences;
 
+import com.pk.tmdbapp.mvp.presenter.MainPresenter;
 import com.pk.tmdbapp.mvp.view.main.MainActivity;
 import com.pk.tmdbapp.mvp.view.activities.DetailActivity;
 import com.pk.tmdbapp.mvp.view.activities.NoInternetActivity;

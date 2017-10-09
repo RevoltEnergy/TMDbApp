@@ -11,6 +11,7 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.powermock.api.mockito.PowerMockito;
@@ -27,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.emory.mathcs.backport.java.util.Arrays;
+import io.reactivex.Observable;
 import io.reactivex.android.plugins.RxAndroidPlugins;
 import io.reactivex.schedulers.Schedulers;
 import io.realm.Realm;
@@ -42,11 +44,11 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import static org.powermock.api.mockito.PowerMockito.doCallRealMethod;
 import static org.powermock.api.mockito.PowerMockito.doNothing;
 import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
@@ -74,6 +76,7 @@ public class DBServiceTest {
     private Realm mockRealm;
     private RealmResults<RealmMovie> realmMovies;
 
+    @Mock
     private DBService dbService;
 
     private List<RealmMovie> movies = new ArrayList<>();
@@ -158,10 +161,10 @@ public class DBServiceTest {
         RxAndroidPlugins.setInitMainThreadSchedulerHandler(__ -> Schedulers.trampoline());
     }
 
-    @Test
+    /*@Test
     public void shouldBeAbleToGetDefaultInstance() {
         assertThat(Realm.getDefaultInstance(), is(mockRealm));
-    }
+    }*/
 
     @Test
     public void shouldBeAbleToMockRealmMethods() {
@@ -186,7 +189,7 @@ public class DBServiceTest {
     @Test
     public void shouldVerifyThatObjectWasCreated() {
 
-        mockRealm = Mockito.mock(Realm.class);
+        //mockRealm = Mockito.mock(Realm.class);
 
         doCallRealMethod().when(mockRealm).executeTransaction(Mockito.any(Realm.Transaction.class));
 
@@ -206,7 +209,6 @@ public class DBServiceTest {
 
     @Test
     public void save() throws Exception {
-        mockRealm = Mockito.mock(Realm.class);
         this.dbService = new DBService(mockRealm);
 
         doCallRealMethod().when(mockRealm).executeTransaction(Mockito.any(Realm.Transaction.class));
@@ -225,7 +227,7 @@ public class DBServiceTest {
 
     @Test
     public void remove() throws Exception {
-        mockRealm = Mockito.mock(Realm.class);
+        //mockRealm = Mockito.mock(Realm.class);
         this.dbService = new DBService(mockRealm);
 
         doCallRealMethod().when(mockRealm).executeTransaction(Mockito.any(Realm.Transaction.class));
@@ -234,13 +236,31 @@ public class DBServiceTest {
     }
 
     @Test
-    public void getAll() throws Exception {
+    public void shouldVerifyThatTransactionWasExecuted() {
 
+        //this.dbService = new DBService(mockRealm);
+        Mockito.when(dbService.getAll()).thenReturn(Observable.empty());
+        dbService.save(new RealmMovie());
+
+        // Verify that the begin transaction was called only once
+        //verify(mockRealm, times(1)).executeTransaction(Mockito.any(Realm.Transaction.class));
+
+        // Verify that the Realm was closed only once.
+        //verify(mockRealm, times(1)).close();
+    }
+
+    @Test
+    public void getAll() throws Exception {
+        Mockito.when(dbService.getAll()).thenReturn(Observable.empty());
+        dbService.removeAll();
+        verify(dbService, times(1)).removeAll();
     }
 
     @Test
     public void removeAll() throws Exception {
-
+        Mockito.when(dbService.removeAll()).thenReturn(Observable.empty());
+        dbService.removeAll();
+        verify(dbService, times(1)).removeAll();
     }
 
     @SuppressWarnings("unchecked")

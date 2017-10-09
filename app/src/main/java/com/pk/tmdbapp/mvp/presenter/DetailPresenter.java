@@ -1,7 +1,6 @@
 package com.pk.tmdbapp.mvp.presenter;
 
 import com.pk.tmdbapp.db.DBService;
-import com.pk.tmdbapp.db.realmmodel.RealmMovie;
 import com.pk.tmdbapp.mvp.model.MovieModel;
 import com.pk.tmdbapp.mvp.view.activities.DetailView;
 import com.pk.tmdbapp.util.RealmMapper;
@@ -28,12 +27,12 @@ public class DetailPresenter {
     }
 
     public void removeFavorite(MovieModel movieModel) {
-        dbService.remove(/*realm,*/ RealmMapper.mapToRealmMovie(movieModel))
+        dbService.remove(RealmMapper.mapToRealmMovie(movieModel))
                 .subscribe(movieModelConsumer -> detailView.onShowToast(movieModelConsumer.getTitle() + " Removed"));
     }
 
     public void saveFavorite(MovieModel movieModel) {
-        dbService.save(/*realm,*/ RealmMapper.mapToRealmMovie(movieModel), RealmMovie.class)
+        dbService.save(RealmMapper.mapToRealmMovie(movieModel))
                 .subscribe(movieModelConsumer -> detailView.onShowToast(movieModelConsumer.getTitle() + " Added"));
     }
 }

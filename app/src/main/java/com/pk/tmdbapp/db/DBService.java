@@ -24,12 +24,12 @@ public class DBService {
         this.realm = realm;
     }
 
-    public <T extends RealmObject> Observable<T> save(T object, Class<T> clazz) {
+    public Observable<RealmMovie> save(RealmMovie object) {
 
-        RealmMovie movie = realm.where(RealmMovie.class).equalTo("title", ((RealmMovie) object).getTitle()).findFirst();
+        RealmMovie movie = realm.where(RealmMovie.class).equalTo("title", object.getTitle()).findFirst();
 
         if (movie != null) {
-            if (((RealmMovie) object).getTitle().equals(movie.getTitle())) {
+            if (object.getTitle().equals(movie.getTitle())) {
                 return Observable.just(object).doOnSubscribe(disposable -> {});
             }
         }
@@ -37,12 +37,12 @@ public class DBService {
         long id = 0L;
 
         try {
-            id = realm.where(clazz).max("id").intValue() + 1;
+            id = realm.where(RealmMovie.class).max("id").intValue() + 1;
         } catch (Exception e) {
             Log.d("DB", e.getMessage());
         }
 
-        ((RealmMovie) object).setId(id);
+        object.setId(id);
 
         return Observable.just(object)
                 .flatMap(t -> Observable.just(t)
@@ -50,25 +50,25 @@ public class DBService {
                 );
     }
 
-    public <T extends RealmObject> Observable<T> remove(T object) {
+    public Observable<RealmMovie> remove(RealmMovie object) {
 
         return Observable.just(object)
                 .flatMap(t -> Observable.just(t)
                         .doOnSubscribe(disposable -> realm.executeTransaction(realm1 -> {
                             RealmResults<RealmMovie> row = realm1.where(RealmMovie.class)
-                                    .equalTo("title",((RealmMovie) object).getTitle())
+                                    .equalTo("title",object.getTitle())
                                     .findAll();
                             row.deleteAllFromRealm();
                         }))
                 );
     }
 
-    public <T extends RealmObject> Observable<List<T>> getAll(Class<T> clazz) {
-        return Observable.just(clazz)
+    public Observable<List<RealmMovie>> getAll() {
+        return Observable.just(RealmMovie.class)
                 .flatMap(t -> Observable.just(t)
-                        .doOnSubscribe(lol -> realm.executeTransaction(realm1 -> realm1.where(RealmMovie.class).findAll()))
-                        .onErrorResumeNext((ObservableSource<? extends Class<T>>) observer -> Observable.empty())
-                        .map(r -> realm.where(r).findAll())
+                        .doOnSubscribe(disposable -> realm.executeTransaction(realm1 -> realm1.where(RealmMovie.class).findAll()))
+                        .onErrorResumeNext((ObservableSource<? extends Class<RealmMovie>>) observer -> Observable.empty())
+                        .map(all -> realm.where(RealmMovie.class).findAll())
                 );
     }
 

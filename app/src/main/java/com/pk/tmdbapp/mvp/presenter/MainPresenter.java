@@ -92,8 +92,11 @@ public class MainPresenter implements Observer<MoviesResponse> {
 
         List<MovieModel> movies = new ArrayList<>();
 
-        dbService.getAll(/*realm, */RealmMovie.class).subscribe(realmMovies ->
-                movies.addAll(RealmMapper.mapToMovieModelList(realmMovies)));
+        dbService.getAll().subscribe(realmMovies ->
+        {
+            System.out.println(realmMovies.size());
+            movies.addAll(RealmMapper.mapToMovieModelList(realmMovies));
+        });
 
         if (movies.isEmpty()) {
             getMainView().onShowToast("You have no favorite movie added");

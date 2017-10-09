@@ -11,6 +11,7 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -35,14 +36,19 @@ import io.realm.RealmResults;
 import io.realm.internal.RealmCore;
 import io.realm.log.RealmLog;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doCallRealMethod;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
 
 import static org.powermock.api.mockito.PowerMockito.doNothing;
 import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
+import static org.powermock.api.mockito.PowerMockito.verifyStatic;
 import static org.powermock.api.mockito.PowerMockito.whenNew;
 
 /**
@@ -136,7 +142,6 @@ public class DBServiceTest {
 
         this.mockRealm = mockRealm;
         this.realmMovies = realmMovies;
-        this.dbService = new DBService(mockRealm);
     }
 
     @BeforeClass
@@ -147,13 +152,27 @@ public class DBServiceTest {
     }
 
     @Test
+    public void shouldBeAbleToGetDefaultInstance() {
+        assertThat(Realm.getDefaultInstance(), is(mockRealm));
+    }
+
+    @Test
     public void save() throws Exception {
-        when(dbService.save(any(RealmMovie.class), RealmMovie.class))
+        this.mockRealm = Realm.getDefaultInstance();
+        this.dbService = new DBService(mockRealm);
+
+        //doCallRealMethod().when(mockRealm).executeTransaction(Mockito.any(Realm.Transaction.class));
+
+        // Verify that two Realm.getInstance() calls took place.
+        verifyStatic(times(1));
+        Realm.getDefaultInstance();
+
+        /*when(dbService.save(any(RealmMovie.class), RealmMovie.class))
                 .thenAnswer(invocationOnMock -> {
                     RealmMovie movie = invocationOnMock.getArgumentAt(0, RealmMovie.class);
                     movies.add(movie);
                     return null;
-                });
+                });*/
     }
 
     @Test

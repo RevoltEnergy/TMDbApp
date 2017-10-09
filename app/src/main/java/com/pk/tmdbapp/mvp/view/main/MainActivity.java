@@ -73,7 +73,7 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        ((TMDbApplication) getApplication()).getAppComponent().inject(this);
+        //((TMDbApplication) getApplication()).getAppComponent().inject(this);
 
         resolveDaggerDependency();
 
@@ -90,7 +90,7 @@ public class MainActivity extends AppCompatActivity
                 .applicationComponent(((TMDbApplication) getApplication()).getAppComponent())
                 .movieModule(new MovieModule(this))
                 .build()
-                //.inject(this)
+                .inject(this)
         ;
     }
 
@@ -126,7 +126,7 @@ public class MainActivity extends AppCompatActivity
         checkSortOrder();
     }
 
-    private void loadFavoriteMovies() {
+    public void loadFavoriteMovies() {
 
         List<MovieModel> movies = new ArrayList<>();
 
@@ -156,12 +156,9 @@ public class MainActivity extends AppCompatActivity
         progressDialog.dismiss();
     }
 
-    private void loadPopularMoviesJSON() {
+    public void loadPopularMoviesJSON() {
         try {
-            if (BuildConfig.TMDB_API_KEY.isEmpty()) {
-                Toast.makeText(getApplicationContext(), "Please obtain API Key from themoviedb.com",
-                        Toast.LENGTH_SHORT).show();
-                progressDialog.dismiss();
+            if (!apiKeyIsObtained()) {
                 return;
             }
 
@@ -183,15 +180,11 @@ public class MainActivity extends AppCompatActivity
         Toast.makeText(MainActivity.this, "Most Popular Movies", Toast.LENGTH_SHORT).show();
     }
 
-    private void loadTopRatedMoviesJSON() {
-        try {
-            if (BuildConfig.TMDB_API_KEY.isEmpty()) {
-                Toast.makeText(getApplicationContext(), "Please obtain API Key from themoviedb.com",
-                        Toast.LENGTH_SHORT).show();
-                progressDialog.dismiss();
+    public void loadTopRatedMoviesJSON() {
+        /*try {
+            if (!apiKeyIsObtained()) {
                 return;
             }
-
             movieAPIService = mRetrofit.create(MovieAPIService.class);
             Observable<MoviesResponse> listObservable = movieAPIService.getTopRatedMoviesObs(BuildConfig.TMDB_API_KEY);
             List<MovieModel> movies = new ArrayList<>();
@@ -207,7 +200,12 @@ public class MainActivity extends AppCompatActivity
             Log.d("Error", e.getMessage());
             Toast.makeText(this, e.toString(), Toast.LENGTH_SHORT).show();
         }
-        Toast.makeText(MainActivity.this, "Top Rated Movies", Toast.LENGTH_SHORT).show();
+        Toast.makeText(MainActivity.this, "Top Rated Movies", Toast.LENGTH_SHORT).show();*/
+        if (!apiKeyIsObtained()) {
+            return;
+        }
+        //mainPresenter.resolveDaggerDependency(((TMDbApplication) getApplication()).getAppComponent());
+        mainPresenter.loadTopRatedMoviesJSON();
     }
 
     public void doOnRetrofitComplete(List<MovieModel> movies) {
@@ -312,7 +310,7 @@ public class MainActivity extends AppCompatActivity
         preferences.unregisterOnSharedPreferenceChangeListener(this);
     }
 
-    private void checkSortOrder() {
+    public void checkSortOrder() {
 
         String sortOrder = preferences.getString(
                 this.getString(R.string.pref_sort_order_key),
@@ -350,6 +348,17 @@ public class MainActivity extends AppCompatActivity
         super.onDestroy();
         if (mRealm != null) {
             mRealm.close();
+        }
+    }
+
+    @Override
+    public boolean apiKeyIsObtained() {
+        if (BuildConfig.TMDB_API_KEY.isEmpty()) {
+            onShowToast("Please obtain API Key from themoviedb.com");
+            progressDialog.dismiss();
+            return false;
+        } else {
+            return true;
         }
     }
 }

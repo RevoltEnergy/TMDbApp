@@ -27,7 +27,10 @@ import com.pk.tmdbapp.R;
 import com.pk.tmdbapp.application.TMDbApplication;
 import com.pk.tmdbapp.db.DBService;
 import com.pk.tmdbapp.db.realmmodel.RealmMovie;
+import com.pk.tmdbapp.di.component.DaggerMovieComponent;
+import com.pk.tmdbapp.di.module.MovieModule;
 import com.pk.tmdbapp.mvp.model.MovieModel;
+import com.pk.tmdbapp.mvp.view.main.MainActivity;
 import com.pk.tmdbapp.util.RealmMapper;
 
 import javax.inject.Inject;
@@ -58,6 +61,7 @@ public class DetailActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ((TMDbApplication) getApplication()).getAppComponent().inject(this);
+        //resolveDaggerDependency();
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -140,6 +144,15 @@ public class DetailActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    protected void resolveDaggerDependency() {
+        DaggerMovieComponent.builder()
+                .applicationComponent(((TMDbApplication) getApplication()).getAppComponent())
+                .movieModule(new MovieModule(new MainActivity()))
+                .build()
+                .inject(this)
+        ;
     }
 
     private void removeFavorite(DBService dbService, MovieModel movieModel) {

@@ -1,9 +1,22 @@
 package com.pk.tmdbapp.mvp.presenter;
 
+import android.content.Context;
+import android.util.Log;
+import android.widget.Toast;
+
+import com.pk.tmdbapp.BuildConfig;
 import com.pk.tmdbapp.api.MovieAPIService;
+import com.pk.tmdbapp.application.TMDbApplication;
+import com.pk.tmdbapp.di.component.ApplicationComponent;
+import com.pk.tmdbapp.di.component.DaggerMovieComponent;
+import com.pk.tmdbapp.di.module.MovieModule;
+import com.pk.tmdbapp.mvp.model.MovieModel;
 import com.pk.tmdbapp.mvp.model.MoviesResponse;
+import com.pk.tmdbapp.mvp.view.main.MainActivity;
 import com.pk.tmdbapp.mvp.view.main.MainView;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
@@ -22,19 +35,60 @@ import retrofit2.Retrofit;
  * Created by ace on 10/04/2017.
  */
 
-public class MainPresenter<V extends MainView> implements Observer<MoviesResponse> {
+public class MainPresenter implements Observer<MoviesResponse> {
 
-    @Inject protected V mainView;
+    @Inject protected MainView mainView;
     @Inject protected MovieAPIService movieAPIService;
     @Inject protected Retrofit retrofit;
     @Inject protected Realm realm;
+    @Inject protected Context context;
 
-    @Inject
+    List<MovieModel> movies = new ArrayList<>();
+
+    /*@Inject
     public MainPresenter() {
         //movieAPIService = retrofit.create(MovieAPIService.class);
+    }*/
+
+    @Inject
+    public MainPresenter(MainView mainView, MovieAPIService movieAPIService, Retrofit retrofit, Realm realm) {
+        this.mainView = mainView;
+        this.movieAPIService = movieAPIService;
+        this.retrofit = retrofit;
+        this.realm = realm;
     }
 
-    protected V getMainView() {
+    public void resolveDaggerDependency(ApplicationComponent appComponent) {
+        DaggerMovieComponent.builder()
+                .applicationComponent(appComponent)
+                //.movieModule(new MovieModule())
+                .build()
+                //.inject(this)
+        ;
+    }
+
+    public void loadTopRatedMoviesJSON() {
+        try {
+            movieAPIService = retrofit.create(MovieAPIService.class);
+            Observable<MoviesResponse> listObservable = movieAPIService.getTopRatedMoviesObs(BuildConfig.TMDB_API_KEY);
+            subscribe(listObservable, this);
+            /*List<MovieModel> movies = new ArrayList<>();
+            listObservable
+                    .subscribeOn(Schedulers.computation())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .timeout(15, TimeUnit.SECONDS, Observable.error(new TimeoutException()))
+                    .onErrorResumeNext(Observable.empty())
+                    .doOnComplete(() -> doOnRetrofitComplete(movies))
+                    .doOnError(this::doOnRetrofitError)
+                    .subscribe(moviesResponse -> movies.addAll(moviesResponse.getResults()));*/
+        } catch (Exception e) {
+            Log.d("Error", e.getMessage());
+            getMainView().onShowToast(e.toString());
+        }
+        getMainView().onShowToast("Top Rated Movies");
+    }
+
+    protected MainView getMainView() {
         return mainView;
     }
 
@@ -55,16 +109,20 @@ public class MainPresenter<V extends MainView> implements Observer<MoviesRespons
 
     @Override
     public void onNext(@NonNull MoviesResponse moviesResponse) {
-
+        movies.addAll(moviesResponse.getResults());
     }
 
     @Override
     public void onError(@NonNull Throwable e) {
-
+        getMainView().doOnRetrofitError(e);
     }
 
     @Override
     public void onComplete() {
+        getMainView().doOnRetrofitComplete(movies);
+    }
 
+    public void setMainView(MainView mainView) {
+        this.mainView = mainView;
     }
 }

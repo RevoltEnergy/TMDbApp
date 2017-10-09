@@ -1,5 +1,9 @@
 package com.pk.tmdbapp.mvp.view.main;
 
+import com.pk.tmdbapp.mvp.model.MovieModel;
+
+import java.util.List;
+
 import javax.inject.Inject;
 
 /**
@@ -8,5 +12,19 @@ import javax.inject.Inject;
 
 public interface MainView {
 
+    void onShowToast(String message);
 
+    void doOnRetrofitComplete(List<MovieModel> movies);
+
+    void doOnRetrofitError(Throwable throwable);
+
+    void checkSortOrder();
+
+    void loadFavoriteMovies();
+
+    void loadPopularMoviesJSON();
+
+    void loadTopRatedMoviesJSON();
+
+    boolean apiKeyIsObtained();
 }

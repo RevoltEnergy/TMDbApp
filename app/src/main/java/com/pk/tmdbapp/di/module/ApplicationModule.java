@@ -14,6 +14,7 @@ import com.pk.tmdbapp.db.migration.RealmMovieMigration;
 import com.pk.tmdbapp.di.scope.PerActivity;
 import com.pk.tmdbapp.di.scope.PerApplication;
 import com.pk.tmdbapp.mvp.presenter.MainPresenter;
+import com.pk.tmdbapp.mvp.view.main.MainView;
 
 import java.util.concurrent.TimeUnit;
 
@@ -117,11 +118,11 @@ public class ApplicationModule {
         return mContext;
     }
 
-    @Singleton
+    /*@Singleton
     @Provides
     MovieAPIService provideMovieAPIService(Retrofit retrofit){
         return retrofit.create(MovieAPIService.class);
-    }
+    }*/
 
     @Singleton
     @Provides
@@ -129,9 +130,8 @@ public class ApplicationModule {
         return new DBService();
     }
 
-    @Singleton
-    @Provides
+    /*@Provides
     MainPresenter provideMainPresenter() {
-        return new MainPresenter();
-    }
+        return new MainPresenter(mainView, movieAPIService, retrofit, realm);
+    }*/
 }

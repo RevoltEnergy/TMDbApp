@@ -20,6 +20,8 @@ public class MovieModule {
 
     private MainView mView;
 
+    //public MovieModule() {}
+
     public MovieModule(MainView view) {
         mView = view;
     }
@@ -36,6 +38,12 @@ public class MovieModule {
     DBService providesDBService() {
         return new DBService();
     }*/
+
+    @PerActivity
+    @Provides
+    MovieAPIService provideMovieAPIService(Retrofit retrofit){
+        return retrofit.create(MovieAPIService.class);
+    }
 
     @PerActivity
     @Provides

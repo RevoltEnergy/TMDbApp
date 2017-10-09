@@ -2,6 +2,9 @@ package com.pk.tmdbapp.di.component;
 
 import com.pk.tmdbapp.di.module.MovieModule;
 import com.pk.tmdbapp.di.scope.PerActivity;
+import com.pk.tmdbapp.mvp.presenter.MainPresenter;
+import com.pk.tmdbapp.mvp.view.activities.DetailActivity;
+import com.pk.tmdbapp.mvp.view.main.MainActivity;
 
 import dagger.Component;
 
@@ -13,5 +16,9 @@ import dagger.Component;
 @Component(modules = MovieModule.class, dependencies = ApplicationComponent.class)
 public interface MovieComponent {
 
-    //void inject(MainActivity activity);
+    void inject(MainActivity activity);
+    void inject(DetailActivity activity);
+
+    //void inject(MainPresenter presenter);
+    //void inject(MainPresenter presenter);
 }

@@ -7,6 +7,7 @@ import com.pk.tmdbapp.api.MovieAPIService;
 import com.pk.tmdbapp.db.DBService;
 import com.pk.tmdbapp.mvp.model.MoviesResponse;
 import com.pk.tmdbapp.mvp.presenter.MainPresenter;
+import com.pk.tmdbapp.mvp.view.activities.DetailView;
 import com.pk.tmdbapp.mvp.view.main.MainActivity;
 import com.pk.tmdbapp.mvp.view.activities.DetailActivity;
 import com.pk.tmdbapp.mvp.view.activities.NoInternetActivity;
@@ -43,7 +44,7 @@ public interface ApplicationComponent {
 
     Context exposeContext();
 
-    void inject(DetailActivity detailActivity);
+    //void inject(DetailActivity detailActivity);
 
     void inject(SettingsActivity settingsActivity);
 

@@ -58,7 +58,6 @@ public class MainActivity extends AppCompatActivity
     @Inject protected SharedPreferences preferences;
     @Inject protected Realm mRealm;
     @Inject protected Retrofit mRetrofit;
-
     @Inject protected MainPresenter mainPresenter;
 
     private RecyclerView recyclerView;

@@ -53,7 +53,7 @@ public class MainPresenter implements Observer<MoviesResponse> {
     @Inject protected Realm realm;
     @Inject protected Context context;
 
-    List<MovieModel> movies = new ArrayList<>();
+    private List<MovieModel> movies = new ArrayList<>();
 
     @Inject
     public MainPresenter(MainView mainView, MovieAPIService movieAPIService, Retrofit retrofit, Realm realm, DBService dbService) {

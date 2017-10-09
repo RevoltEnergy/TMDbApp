@@ -27,9 +27,12 @@ import com.pk.tmdbapp.R;
 import com.pk.tmdbapp.application.TMDbApplication;
 import com.pk.tmdbapp.db.DBService;
 import com.pk.tmdbapp.db.realmmodel.RealmMovie;
+import com.pk.tmdbapp.di.component.DaggerDetailComponent;
 import com.pk.tmdbapp.di.component.DaggerMovieComponent;
+import com.pk.tmdbapp.di.module.DetailModule;
 import com.pk.tmdbapp.di.module.MovieModule;
 import com.pk.tmdbapp.mvp.model.MovieModel;
+import com.pk.tmdbapp.mvp.presenter.DetailPresenter;
 import com.pk.tmdbapp.mvp.view.main.MainActivity;
 import com.pk.tmdbapp.util.RealmMapper;
 
@@ -41,10 +44,11 @@ import io.realm.Realm;
  * Created by ace on 10/02/2017.
  */
 
-public class DetailActivity extends AppCompatActivity {
+public class DetailActivity extends AppCompatActivity implements DetailView {
 
     @Inject Realm mRealm;
     @Inject DBService dbService;
+    @Inject DetailPresenter detailPresenter;
 
     TextView nameOfMovie;
     TextView plotSynopsis;
@@ -54,13 +58,23 @@ public class DetailActivity extends AppCompatActivity {
     ProgressBar progressBar;
     ThreeBounce threeBounce;
 
+    protected void resolveDaggerDependency() {
+        DaggerDetailComponent.builder()
+                .applicationComponent(((TMDbApplication) getApplication()).getAppComponent())
+                .detailModule(new DetailModule(this))
+                .build()
+                .inject(this)
+        ;
+    }
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        ((TMDbApplication) getApplication()).getAppComponent().inject(this);
+        //((TMDbApplication) getApplication()).getAppComponent().inject(this);
+        resolveDaggerDependency();
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -132,13 +146,15 @@ public class DetailActivity extends AppCompatActivity {
                 if (favorite) {
                     editor.putBoolean("Favorite Added", true);
                     editor.apply();
-                    saveFavorite(dbService, movieModel);
-                    Snackbar.make(buttonView, "Added to Favorite", Snackbar.LENGTH_SHORT).show();
+                    detailPresenter.saveFavorite(movieModel);
+                    //saveFavorite(dbService, movieModel);
+                    //Snackbar.make(buttonView, "Added to Favorite", Snackbar.LENGTH_SHORT).show();
                 } else {
                     editor.putBoolean("Favorite Removed", true);
                     editor.apply();
-                    removeFavorite(dbService, movieModel);
-                    Snackbar.make(buttonView, "Removed from Favorite", Snackbar.LENGTH_SHORT).show();
+                    detailPresenter.removeFavorite(movieModel);
+                    //removeFavorite(dbService, movieModel);
+                    //Snackbar.make(buttonView, "Removed from Favorite", Snackbar.LENGTH_SHORT).show();
                 }
             }
         });
@@ -180,5 +196,10 @@ public class DetailActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    @Override
+    public void onShowToast(String message) {
+        Toast.makeText(getBaseContext(), message, Toast.LENGTH_SHORT).show();
     }
 }

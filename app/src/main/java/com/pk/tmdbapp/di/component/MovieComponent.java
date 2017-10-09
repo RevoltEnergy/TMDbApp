@@ -1,5 +1,6 @@
 package com.pk.tmdbapp.di.component;
 
+import com.pk.tmdbapp.api.MovieAPIService;
 import com.pk.tmdbapp.di.module.MovieModule;
 import com.pk.tmdbapp.di.scope.PerActivity;
 import com.pk.tmdbapp.mvp.presenter.MainPresenter;
@@ -17,8 +18,5 @@ import dagger.Component;
 public interface MovieComponent {
 
     void inject(MainActivity activity);
-    void inject(DetailActivity activity);
-
-    //void inject(MainPresenter presenter);
-    //void inject(MainPresenter presenter);
+    //void inject(DetailActivity activity);
 }

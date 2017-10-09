@@ -18,6 +18,10 @@ public interface MainView {
 
     void doOnRetrofitError(Throwable throwable);
 
+    void doOnLoadDataComplete(List<MovieModel> movies);
+
+    void updateSortPreferences(String key, String value);
+
     void checkSortOrder();
 
     void loadFavoriteMovies();

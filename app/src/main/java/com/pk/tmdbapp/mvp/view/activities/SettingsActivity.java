@@ -22,16 +22,16 @@ import io.realm.Realm;
 public class SettingsActivity extends PreferenceActivity {
 
     @Inject Realm realm;
+    @Inject DBService dbService;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
-        //((TMDbApplication) getApplication()).getAppComponent().inject(this);
+        ((TMDbApplication) getApplication()).getAppComponent().inject(this);
 
         final Button button = (Button) findViewById(R.id.clear_favorite_button);
         button.setOnClickListener(v -> {
-            DBService dbService = new DBService();
             dbService.removeAll(realm).subscribe();
             realm.close();
             Intent intent = new Intent(this, MainActivity.class);

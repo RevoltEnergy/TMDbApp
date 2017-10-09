@@ -21,7 +21,6 @@ public class TMDbApplication extends Application {
         appComponent = DaggerApplicationComponent.builder()
                 .applicationModule(new ApplicationModule(this))
                 .build();
-        //appComponent.inject(this);
     }
 
     @Override

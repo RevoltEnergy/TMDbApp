@@ -1,19 +1,27 @@
 package com.pk.tmdbapp.mvp.presenter;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.pk.tmdbapp.BuildConfig;
+import com.pk.tmdbapp.R;
 import com.pk.tmdbapp.api.MovieAPIService;
 import com.pk.tmdbapp.application.TMDbApplication;
+import com.pk.tmdbapp.db.DBService;
+import com.pk.tmdbapp.db.realmmodel.RealmMovie;
 import com.pk.tmdbapp.di.component.ApplicationComponent;
 import com.pk.tmdbapp.di.component.DaggerMovieComponent;
 import com.pk.tmdbapp.di.module.MovieModule;
 import com.pk.tmdbapp.mvp.model.MovieModel;
 import com.pk.tmdbapp.mvp.model.MoviesResponse;
+import com.pk.tmdbapp.mvp.view.activities.NoInternetActivity;
 import com.pk.tmdbapp.mvp.view.main.MainActivity;
 import com.pk.tmdbapp.mvp.view.main.MainView;
+import com.pk.tmdbapp.util.CheckNetwork;
+import com.pk.tmdbapp.util.RealmMapper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +37,7 @@ import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import io.realm.Realm;
+import io.realm.annotations.Ignore;
 import retrofit2.Retrofit;
 
 /**
@@ -40,17 +49,19 @@ public class MainPresenter implements Observer<MoviesResponse> {
     @Inject protected MainView mainView;
     @Inject protected MovieAPIService movieAPIService;
     @Inject protected Retrofit retrofit;
+    @Inject protected DBService dbService;
     @Inject protected Realm realm;
     @Inject protected Context context;
 
     List<MovieModel> movies = new ArrayList<>();
 
     @Inject
-    public MainPresenter(MainView mainView, MovieAPIService movieAPIService, Retrofit retrofit, Realm realm) {
+    public MainPresenter(MainView mainView, MovieAPIService movieAPIService, Retrofit retrofit, Realm realm, DBService dbService) {
         this.mainView = mainView;
         this.movieAPIService = movieAPIService;
         this.retrofit = retrofit;
         this.realm = realm;
+        this.dbService = dbService;
     }
 
     public void loadTopRatedMoviesJSON() {
@@ -75,6 +86,30 @@ public class MainPresenter implements Observer<MoviesResponse> {
             getMainView().onShowToast(e.toString());
         }
         getMainView().onShowToast("Most Popular Movies");
+    }
+
+    public void loadFavoriteMovies(Activity activity) {
+
+        List<MovieModel> movies = new ArrayList<>();
+
+        dbService.getAll(realm, RealmMovie.class).subscribe(realmMovies ->
+                movies.addAll(RealmMapper.mapToMovieModelList(realmMovies)));
+
+        if (movies.isEmpty()) {
+            getMainView().onShowToast("You have no favorite movie added");
+            if (!CheckNetwork.isInternetAvailable(activity)) {
+                Intent intent = new Intent(activity, NoInternetActivity.class);
+                activity.startActivity(intent);
+            } else {
+                getMainView().updateSortPreferences(
+                        activity.getString(R.string.pref_sort_order_key),
+                        activity.getString(R.string.pref_most_popular));
+                getMainView().checkSortOrder();
+            }
+        } else {
+            getMainView().onShowToast("Favorite Movies");
+        }
+        getMainView().doOnLoadDataComplete(movies);
     }
 
     protected MainView getMainView() {

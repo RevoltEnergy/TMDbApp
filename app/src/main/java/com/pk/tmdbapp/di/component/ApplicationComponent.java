@@ -45,6 +45,8 @@ public interface ApplicationComponent {
 
     void inject(DetailActivity detailActivity);
 
+    void inject(SettingsActivity settingsActivity);
+
     //MainView exposeMainView();
 
     /*void inject(TMDbApplication application);

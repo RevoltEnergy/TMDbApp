@@ -61,7 +61,6 @@ public class DetailActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ((TMDbApplication) getApplication()).getAppComponent().inject(this);
-        //resolveDaggerDependency();
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -144,15 +143,6 @@ public class DetailActivity extends AppCompatActivity {
             }
         });
 
-    }
-
-    protected void resolveDaggerDependency() {
-        DaggerMovieComponent.builder()
-                .applicationComponent(((TMDbApplication) getApplication()).getAppComponent())
-                .movieModule(new MovieModule(new MainActivity()))
-                .build()
-                .inject(this)
-        ;
     }
 
     private void removeFavorite(DBService dbService, MovieModel movieModel) {

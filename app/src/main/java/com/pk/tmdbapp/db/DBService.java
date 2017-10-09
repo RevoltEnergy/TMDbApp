@@ -64,12 +64,7 @@ public class DBService {
     }
 
     public Observable<List<RealmMovie>> getAll() {
-        return Observable.just(RealmMovie.class)
-                .flatMap(t -> Observable.just(t)
-                        .doOnSubscribe(disposable -> realm.executeTransaction(realm1 -> realm1.where(RealmMovie.class).findAll()))
-                        .onErrorResumeNext((ObservableSource<? extends Class<RealmMovie>>) observer -> Observable.empty())
-                        .map(all -> realm.where(RealmMovie.class).findAll())
-                );
+        return Observable.just(realm.where(RealmMovie.class).findAll());
     }
 
     public Observable removeAll() {

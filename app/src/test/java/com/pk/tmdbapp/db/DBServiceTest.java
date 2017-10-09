@@ -11,6 +11,7 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -40,7 +41,9 @@ import io.realm.internal.RealmCore;
 import io.realm.log.RealmLog;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
@@ -67,9 +70,6 @@ import static org.powermock.api.mockito.PowerMockito.whenNew;
 @PrepareForTest({Realm.class, RealmConfiguration.class, RealmQuery.class, RealmResults.class, RealmCore.class, RealmLog.class})
 public class DBServiceTest {
 
-    //@Rule
-    //public MockitoRule rule = MockitoJUnit.rule();
-
     @Rule
     public PowerMockRule rule = new PowerMockRule();
 
@@ -91,8 +91,6 @@ public class DBServiceTest {
         mockStatic(RealmConfiguration.class);
         Realm.init(RuntimeEnvironment.application);
 
-        //final Realm mockRealm = mock(Realm.class);
-        //Realm mockRealm = PowerMockito.mock(Realm.class);
         Realm mockRealm = PowerMockito.mock(Realm.class);
         final RealmConfiguration mockRealmConfig = mock(RealmConfiguration.class);
 
@@ -144,10 +142,6 @@ public class DBServiceTest {
 
         when(realmMovies.size()).thenReturn(movieList.size());
 
-        /*RealmConfiguration config =
-                new RealmConfiguration.Builder().inMemory().name("test-mockRealm").build();
-        mockRealm = Realm.getInstance(config);*/
-
         when(Realm.getDefaultInstance()).thenReturn(mockRealm);
 
         this.mockRealm = mockRealm;
@@ -156,15 +150,14 @@ public class DBServiceTest {
 
     @BeforeClass
     public static void setUpClass() {
-
         // Override the default "out of the box" AndroidSchedulers.mainThread() Scheduler
         RxAndroidPlugins.setInitMainThreadSchedulerHandler(__ -> Schedulers.trampoline());
     }
 
-    /*@Test
+    @Test
     public void shouldBeAbleToGetDefaultInstance() {
         assertThat(Realm.getDefaultInstance(), is(mockRealm));
-    }*/
+    }
 
     @Test
     public void shouldBeAbleToMockRealmMethods() {
@@ -178,9 +171,7 @@ public class DBServiceTest {
     @Test
     public void shouldBeAbleToCreateARealmObject() {
         RealmMovie movie = new RealmMovie();
-
         when(mockRealm.createObject(RealmMovie.class)).thenReturn(movie);
-
         RealmMovie output = mockRealm.createObject(RealmMovie.class);
 
         assertThat(output, is(movie));
@@ -188,79 +179,55 @@ public class DBServiceTest {
 
     @Test
     public void shouldVerifyThatObjectWasCreated() {
-
-        //mockRealm = Mockito.mock(Realm.class);
-
-        doCallRealMethod().when(mockRealm).executeTransaction(Mockito.any(Realm.Transaction.class));
-
+        Realm mockRealm = Mockito.mock(Realm.class);
         RealmMovie movie = Mockito.mock(RealmMovie.class);
-        when(mockRealm.createObject(RealmMovie.class)).thenReturn(movie);
+        Mockito.when(mockRealm.createObject(RealmMovie.class)).thenReturn(movie);
+        mockRealm.createObject(RealmMovie.class);
 
-/*
-        // Verify that Realm#createObject was called only once
-        verify(mockRealm, times(1)).createObject(Dog.class); // Verify that a Dog was in fact created.
-
-        // Verify that Dog#setName() is called only once
-        verify(movie, times(1)).setName(Mockito.anyString()); // Any string will do
-
-        // Verify that the Realm was closed only once.
-        verify(mockRealm, times(1)).close();*/
+        Mockito.verify(mockRealm, times(1)).createObject(RealmMovie.class);
     }
 
     @Test
     public void save() throws Exception {
-        this.dbService = new DBService(mockRealm);
-
         doCallRealMethod().when(mockRealm).executeTransaction(Mockito.any(Realm.Transaction.class));
-
-        // Verify that two Realm.getInstance() calls took place.
-        /*verifyStatic(times(1));
-        Realm.getDefaultInstance();*/
-
-        /*when(dbService.save(any(RealmMovie.class), RealmMovie.class))
+        PowerMockito.when(dbService.save(any(RealmMovie.class)))
                 .thenAnswer(invocationOnMock -> {
                     RealmMovie movie = invocationOnMock.getArgumentAt(0, RealmMovie.class);
                     movies.add(movie);
                     return null;
-                });*/
+                });
+        dbService.save(any(RealmMovie.class));
+
+        Mockito.verify(dbService, times(1)).save(any(RealmMovie.class));
+        assertEquals(movies.size(), 1);
     }
 
     @Test
     public void remove() throws Exception {
-        //mockRealm = Mockito.mock(Realm.class);
-        this.dbService = new DBService(mockRealm);
-
         doCallRealMethod().when(mockRealm).executeTransaction(Mockito.any(Realm.Transaction.class));
-        //when(dbService.remove(Mockito.any(RealmMovie.class)))
-          //      .thenAnswer(invocationOnMock -> movies.get(/*invocationOnMock.getArguments()*/ 0));
-    }
+        PowerMockito.when(dbService.remove(Mockito.any(RealmMovie.class)))
+                .thenAnswer(invocationOnMock -> {
+                    movies.clear();
+                    return null;
+                });
+        dbService.remove(any(RealmMovie.class));
 
-    @Test
-    public void shouldVerifyThatTransactionWasExecuted() {
-
-        //this.dbService = new DBService(mockRealm);
-        Mockito.when(dbService.getAll()).thenReturn(Observable.empty());
-        dbService.save(new RealmMovie());
-
-        // Verify that the begin transaction was called only once
-        //verify(mockRealm, times(1)).executeTransaction(Mockito.any(Realm.Transaction.class));
-
-        // Verify that the Realm was closed only once.
-        //verify(mockRealm, times(1)).close();
+        Mockito.verify(dbService, times(1)).remove(any(RealmMovie.class));
+        assertEquals(movies.size(), 0);
     }
 
     @Test
     public void getAll() throws Exception {
         Mockito.when(dbService.getAll()).thenReturn(Observable.empty());
         dbService.removeAll();
-        verify(dbService, times(1)).removeAll();
+        Mockito.verify(dbService, times(1)).removeAll();
     }
 
     @Test
     public void removeAll() throws Exception {
         Mockito.when(dbService.removeAll()).thenReturn(Observable.empty());
         dbService.removeAll();
-        verify(dbService, times(1)).removeAll();
+        Mockito.verify(dbService, times(1)).removeAll();
     }
 
     @SuppressWarnings("unchecked")
@@ -271,11 +238,6 @@ public class DBServiceTest {
     @SuppressWarnings("unchecked")
     private <T extends RealmObject> RealmResults<T> mockRealmResults() {
         return mock(RealmResults.class);
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        //mockRealm.close();
     }
 
     @AfterClass

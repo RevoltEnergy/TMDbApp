@@ -45,11 +45,6 @@ public class MainPresenter implements Observer<MoviesResponse> {
 
     List<MovieModel> movies = new ArrayList<>();
 
-    /*@Inject
-    public MainPresenter() {
-        //movieAPIService = retrofit.create(MovieAPIService.class);
-    }*/
-
     @Inject
     public MainPresenter(MainView mainView, MovieAPIService movieAPIService, Retrofit retrofit, Realm realm) {
         this.mainView = mainView;
@@ -58,34 +53,28 @@ public class MainPresenter implements Observer<MoviesResponse> {
         this.realm = realm;
     }
 
-    public void resolveDaggerDependency(ApplicationComponent appComponent) {
-        DaggerMovieComponent.builder()
-                .applicationComponent(appComponent)
-                //.movieModule(new MovieModule())
-                .build()
-                //.inject(this)
-        ;
-    }
-
     public void loadTopRatedMoviesJSON() {
         try {
             movieAPIService = retrofit.create(MovieAPIService.class);
             Observable<MoviesResponse> listObservable = movieAPIService.getTopRatedMoviesObs(BuildConfig.TMDB_API_KEY);
             subscribe(listObservable, this);
-            /*List<MovieModel> movies = new ArrayList<>();
-            listObservable
-                    .subscribeOn(Schedulers.computation())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .timeout(15, TimeUnit.SECONDS, Observable.error(new TimeoutException()))
-                    .onErrorResumeNext(Observable.empty())
-                    .doOnComplete(() -> doOnRetrofitComplete(movies))
-                    .doOnError(this::doOnRetrofitError)
-                    .subscribe(moviesResponse -> movies.addAll(moviesResponse.getResults()));*/
         } catch (Exception e) {
             Log.d("Error", e.getMessage());
             getMainView().onShowToast(e.toString());
         }
         getMainView().onShowToast("Top Rated Movies");
+    }
+
+    public void loadPopularMoviesJSON() {
+        try {
+            movieAPIService = retrofit.create(MovieAPIService.class);
+            Observable<MoviesResponse> listObservable = movieAPIService.getPopularMoviesObs(BuildConfig.TMDB_API_KEY);
+            subscribe(listObservable, this);
+        } catch (Exception e) {
+            Log.d("Error", e.getMessage());
+            getMainView().onShowToast(e.toString());
+        }
+        getMainView().onShowToast("Most Popular Movies");
     }
 
     protected MainView getMainView() {
@@ -101,7 +90,6 @@ public class MainPresenter implements Observer<MoviesResponse> {
                 .subscribe(observer);
     }
 
-
     @Override
     public void onSubscribe(@NonNull Disposable d) {
 
@@ -109,6 +97,7 @@ public class MainPresenter implements Observer<MoviesResponse> {
 
     @Override
     public void onNext(@NonNull MoviesResponse moviesResponse) {
+        movies.clear();
         movies.addAll(moviesResponse.getResults());
     }
 
@@ -120,9 +109,5 @@ public class MainPresenter implements Observer<MoviesResponse> {
     @Override
     public void onComplete() {
         getMainView().doOnRetrofitComplete(movies);
-    }
-
-    public void setMainView(MainView mainView) {
-        this.mainView = mainView;
     }
 }

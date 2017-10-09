@@ -157,7 +157,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void loadPopularMoviesJSON() {
-        try {
+        /*try {
             if (!apiKeyIsObtained()) {
                 return;
             }
@@ -177,7 +177,11 @@ public class MainActivity extends AppCompatActivity
             Log.d("Error", e.getMessage());
             Toast.makeText(this, e.toString(), Toast.LENGTH_SHORT).show();
         }
-        Toast.makeText(MainActivity.this, "Most Popular Movies", Toast.LENGTH_SHORT).show();
+        Toast.makeText(MainActivity.this, "Most Popular Movies", Toast.LENGTH_SHORT).show();*/
+        if (!apiKeyIsObtained()) {
+            return;
+        }
+        mainPresenter.loadPopularMoviesJSON();
     }
 
     public void loadTopRatedMoviesJSON() {

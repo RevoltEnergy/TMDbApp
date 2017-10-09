@@ -18,7 +18,13 @@ import io.realm.RealmResults;
 
 public class DBService {
 
-    public <T extends RealmObject> Observable<T> save(Realm realm, T object, Class<T> clazz) {
+    private Realm realm;
+
+    public DBService(Realm realm) {
+        this.realm = realm;
+    }
+
+    public <T extends RealmObject> Observable<T> save(/*Realm realm, */T object, Class<T> clazz) {
 
         RealmMovie movie = realm.where(RealmMovie.class).equalTo("title", ((RealmMovie) object).getTitle()).findFirst();
 
@@ -44,7 +50,7 @@ public class DBService {
                 );
     }
 
-    public <T extends RealmObject> Observable<T> remove(Realm realm, T object) {
+    public <T extends RealmObject> Observable<T> remove(/*Realm realm, */T object) {
 
         return Observable.just(object)
                 .flatMap(t -> Observable.just(t)
@@ -57,7 +63,7 @@ public class DBService {
                 );
     }
 
-    public <T extends RealmObject> Observable<List<T>> getAll(Realm realm, Class<T> clazz) {
+    public <T extends RealmObject> Observable<List<T>> getAll(/*Realm realm, */Class<T> clazz) {
         return Observable.just(clazz)
                 .flatMap(t -> Observable.just(t)
                         .doOnSubscribe(lol -> realm.executeTransaction(realm1 -> realm1.where(RealmMovie.class).findAll()))
@@ -66,7 +72,7 @@ public class DBService {
                 );
     }
 
-    public <T extends RealmObject> Observable removeAll(Realm realm) {
+    public <T extends RealmObject> Observable removeAll(/*Realm realm*/) {
         return Observable.empty().doOnSubscribe(disposable -> realm.executeTransaction(realm1 -> realm1.deleteAll()));
     }
 }

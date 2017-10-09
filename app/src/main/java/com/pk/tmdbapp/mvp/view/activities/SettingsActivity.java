@@ -32,7 +32,7 @@ public class SettingsActivity extends PreferenceActivity {
 
         final Button button = (Button) findViewById(R.id.clear_favorite_button);
         button.setOnClickListener(v -> {
-            dbService.removeAll(realm).subscribe();
+            dbService.removeAll(/*realm*/).subscribe();
             realm.close();
             Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);

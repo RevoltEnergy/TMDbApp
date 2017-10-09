@@ -92,7 +92,7 @@ public class MainPresenter implements Observer<MoviesResponse> {
 
         List<MovieModel> movies = new ArrayList<>();
 
-        dbService.getAll(realm, RealmMovie.class).subscribe(realmMovies ->
+        dbService.getAll(/*realm, */RealmMovie.class).subscribe(realmMovies ->
                 movies.addAll(RealmMapper.mapToMovieModelList(realmMovies)));
 
         if (movies.isEmpty()) {

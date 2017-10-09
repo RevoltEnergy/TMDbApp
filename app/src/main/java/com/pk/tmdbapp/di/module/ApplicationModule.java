@@ -114,7 +114,7 @@ public class ApplicationModule {
 
     @Singleton
     @Provides
-    DBService provideDBService() {
-        return new DBService();
+    DBService provideDBService(Realm realm) {
+        return new DBService(realm);
     }
 }

@@ -28,12 +28,12 @@ public class DetailPresenter {
     }
 
     public void removeFavorite(MovieModel movieModel) {
-        dbService.remove(realm, RealmMapper.mapToRealmMovie(movieModel))
+        dbService.remove(/*realm,*/ RealmMapper.mapToRealmMovie(movieModel))
                 .subscribe(movieModelConsumer -> detailView.onShowToast(movieModelConsumer.getTitle() + " Removed"));
     }
 
     public void saveFavorite(MovieModel movieModel) {
-        dbService.save(realm, RealmMapper.mapToRealmMovie(movieModel), RealmMovie.class)
+        dbService.save(/*realm,*/ RealmMapper.mapToRealmMovie(movieModel), RealmMovie.class)
                 .subscribe(movieModelConsumer -> detailView.onShowToast(movieModelConsumer.getTitle() + " Added"));
     }
 }

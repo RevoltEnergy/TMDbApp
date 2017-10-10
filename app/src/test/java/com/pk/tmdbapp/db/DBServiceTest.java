@@ -4,14 +4,12 @@ import android.content.Context;
 
 import com.pk.tmdbapp.db.realmmodel.RealmMovie;
 
-import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -28,7 +26,6 @@ import org.robolectric.RuntimeEnvironment;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.emory.mathcs.backport.java.util.Arrays;
 import io.reactivex.Observable;
 import io.reactivex.android.plugins.RxAndroidPlugins;
 import io.reactivex.schedulers.Schedulers;
@@ -43,19 +40,14 @@ import io.realm.log.RealmLog;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-
 import static org.powermock.api.mockito.PowerMockito.doCallRealMethod;
 import static org.powermock.api.mockito.PowerMockito.doNothing;
 import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
-import static org.powermock.api.mockito.PowerMockito.verifyStatic;
 import static org.powermock.api.mockito.PowerMockito.when;
 import static org.powermock.api.mockito.PowerMockito.whenNew;
 
@@ -70,14 +62,12 @@ import static org.powermock.api.mockito.PowerMockito.whenNew;
 @PrepareForTest({Realm.class, RealmConfiguration.class, RealmQuery.class, RealmResults.class, RealmCore.class, RealmLog.class})
 public class DBServiceTest {
 
-    @Rule
-    public PowerMockRule rule = new PowerMockRule();
+    @Rule public PowerMockRule rule = new PowerMockRule();
 
     private Realm mockRealm;
     private RealmResults<RealmMovie> realmMovies;
 
-    @Mock
-    private DBService dbService;
+    @Mock private DBService dbService;
 
     private List<RealmMovie> movies = new ArrayList<>();
 

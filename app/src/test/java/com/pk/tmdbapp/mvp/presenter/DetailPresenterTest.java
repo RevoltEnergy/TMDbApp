@@ -1,40 +1,25 @@
 package com.pk.tmdbapp.mvp.presenter;
 
 import com.pk.tmdbapp.db.DBService;
-import com.pk.tmdbapp.db.realmmodel.RealmMovie;
 import com.pk.tmdbapp.mvp.model.MovieModel;
 import com.pk.tmdbapp.mvp.view.activities.DetailView;
 
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-import org.mockito.runners.MockitoJUnit44Runner;
-import org.powermock.modules.junit4.PowerMockRunner;
 
-import java.util.ArrayList;
-import java.util.Observable;
-
-import io.reactivex.android.plugins.RxAndroidPlugins;
-import io.reactivex.schedulers.Schedulers;
 import io.realm.Realm;
 
-import static org.mockito.AdditionalAnswers.returnsFirstArg;
-import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 /**
  * Created by ace on 10/09/2017.

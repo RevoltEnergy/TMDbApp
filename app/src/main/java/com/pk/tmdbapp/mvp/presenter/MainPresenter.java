@@ -71,9 +71,9 @@ public class MainPresenter implements Observer<MoviesResponse> {
             subscribe(listObservable, this);
         } catch (Exception e) {
             Log.d("Error", e.getMessage());
-            getMainView().onShowToast(e.toString());
+            mainView.onShowToast(e.toString());
         }
-        getMainView().onShowToast("Top Rated Movies");
+        mainView.onShowToast("Top Rated Movies");
     }
 
     public void loadPopularMoviesJSON() {
@@ -83,9 +83,9 @@ public class MainPresenter implements Observer<MoviesResponse> {
             subscribe(listObservable, this);
         } catch (Exception e) {
             Log.d("Error", e.getMessage());
-            getMainView().onShowToast(e.toString());
+            mainView.onShowToast(e.toString());
         }
-        getMainView().onShowToast("Most Popular Movies");
+        mainView.onShowToast("Most Popular Movies");
     }
 
     public void loadFavoriteMovies(Activity activity) {
@@ -99,24 +99,20 @@ public class MainPresenter implements Observer<MoviesResponse> {
         });
 
         if (movies.isEmpty()) {
-            getMainView().onShowToast("You have no favorite movie added");
+            mainView.onShowToast("You have no favorite movie added");
             if (!CheckNetwork.isInternetAvailable(activity)) {
                 Intent intent = new Intent(activity, NoInternetActivity.class);
                 activity.startActivity(intent);
             } else {
-                getMainView().updateSortPreferences(
+                mainView.updateSortPreferences(
                         activity.getString(R.string.pref_sort_order_key),
                         activity.getString(R.string.pref_most_popular));
-                getMainView().checkSortOrder();
+                mainView.checkSortOrder();
             }
         } else {
-            getMainView().onShowToast("Favorite Movies");
+            mainView.onShowToast("Favorite Movies");
         }
-        getMainView().doOnLoadDataComplete(movies);
-    }
-
-    protected MainView getMainView() {
-        return mainView;
+        mainView.doOnLoadDataComplete(movies);
     }
 
     protected <T> void subscribe(Observable<T> observable, Observer<T> observer) {
@@ -141,11 +137,11 @@ public class MainPresenter implements Observer<MoviesResponse> {
 
     @Override
     public void onError(@NonNull Throwable e) {
-        getMainView().doOnRetrofitError(e);
+        mainView.doOnRetrofitError(e);
     }
 
     @Override
     public void onComplete() {
-        getMainView().doOnRetrofitComplete(movies);
+        mainView.doOnRetrofitComplete(movies);
     }
 }

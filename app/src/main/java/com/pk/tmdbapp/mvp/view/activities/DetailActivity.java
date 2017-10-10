@@ -1,4 +1,4 @@
-package com.pk.tmdbapp.activities;
+package com.pk.tmdbapp.mvp.view.activities;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -27,7 +27,13 @@ import com.pk.tmdbapp.R;
 import com.pk.tmdbapp.application.TMDbApplication;
 import com.pk.tmdbapp.db.DBService;
 import com.pk.tmdbapp.db.realmmodel.RealmMovie;
+import com.pk.tmdbapp.di.component.DaggerDetailComponent;
+import com.pk.tmdbapp.di.component.DaggerMovieComponent;
+import com.pk.tmdbapp.di.module.DetailModule;
+import com.pk.tmdbapp.di.module.MovieModule;
 import com.pk.tmdbapp.mvp.model.MovieModel;
+import com.pk.tmdbapp.mvp.presenter.DetailPresenter;
+import com.pk.tmdbapp.mvp.view.main.MainActivity;
 import com.pk.tmdbapp.util.RealmMapper;
 
 import javax.inject.Inject;
@@ -38,9 +44,9 @@ import io.realm.Realm;
  * Created by ace on 10/02/2017.
  */
 
-public class DetailActivity extends AppCompatActivity {
+public class DetailActivity extends AppCompatActivity implements DetailView {
 
-    @Inject Realm mRealm;
+    @Inject DetailPresenter detailPresenter;
 
     TextView nameOfMovie;
     TextView plotSynopsis;
@@ -56,13 +62,11 @@ public class DetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_detail);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        ((TMDbApplication) getApplication()).getAppComponent().inject(this);
+        resolveDaggerDependency();
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         initCollapsingToolbar();
-
-        DBService dbService = new DBService();
 
         MovieModel movieModel = new MovieModel();
 
@@ -123,34 +127,22 @@ public class DetailActivity extends AppCompatActivity {
 
         materialFavoriteButton.setOnFavoriteChangeListener(new MaterialFavoriteButton.OnFavoriteChangeListener() {
             SharedPreferences.Editor editor =
-                    getSharedPreferences("com.pk.tmdbapp.activities.DetailActivity", MODE_PRIVATE).edit();
+                    getSharedPreferences("com.pk.tmdbapp.mvp.view.activities.DetailActivity", MODE_PRIVATE).edit();
             @Override
             public void onFavoriteChanged(MaterialFavoriteButton buttonView, boolean favorite) {
 
                 if (favorite) {
                     editor.putBoolean("Favorite Added", true);
                     editor.apply();
-                    saveFavorite(dbService, movieModel);
-                    Snackbar.make(buttonView, "Added to Favorite", Snackbar.LENGTH_SHORT).show();
+                    detailPresenter.saveFavorite(movieModel);
                 } else {
                     editor.putBoolean("Favorite Removed", true);
                     editor.apply();
-                    removeFavorite(dbService, movieModel);
-                    Snackbar.make(buttonView, "Removed from Favorite", Snackbar.LENGTH_SHORT).show();
+                    detailPresenter.removeFavorite(movieModel);
                 }
             }
         });
 
-    }
-
-    private void removeFavorite(DBService dbService, MovieModel movieModel) {
-        dbService.remove(mRealm, RealmMapper.mapToRealmMovie(movieModel))
-                .subscribe(movieModelConsumer -> Toast.makeText(getBaseContext(), "Removed", Toast.LENGTH_SHORT).show());
-    }
-
-    private void saveFavorite(DBService dbService, MovieModel movieModel) {
-        dbService.save(mRealm, RealmMapper.mapToRealmMovie(movieModel), RealmMovie.class)
-                .subscribe(movieModelConsumer -> Toast.makeText(getBaseContext(), "Saved", Toast.LENGTH_SHORT).show());
     }
 
     private void initCollapsingToolbar() {
@@ -178,5 +170,19 @@ public class DetailActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    protected void resolveDaggerDependency() {
+        DaggerDetailComponent.builder()
+                .applicationComponent(((TMDbApplication) getApplication()).getAppComponent())
+                .detailModule(new DetailModule(this))
+                .build()
+                .inject(this)
+        ;
+    }
+
+    @Override
+    public void onShowToast(String message) {
+        Toast.makeText(getBaseContext(), message, Toast.LENGTH_SHORT).show();
     }
 }

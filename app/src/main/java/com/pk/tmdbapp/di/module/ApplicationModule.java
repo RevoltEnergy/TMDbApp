@@ -1,6 +1,5 @@
 package com.pk.tmdbapp.di.module;
 
-import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
@@ -8,6 +7,7 @@ import android.preference.PreferenceManager;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.pk.tmdbapp.db.DBService;
 import com.pk.tmdbapp.db.migration.RealmMovieMigration;
 
 import java.util.concurrent.TimeUnit;
@@ -92,7 +92,6 @@ public class ApplicationModule {
                 .build();
     }
 
-    //@Singleton
     @Provides
     Realm provideRealm(Context context) {
         Realm.init(context);
@@ -113,9 +112,9 @@ public class ApplicationModule {
         return mContext;
     }
 
-    /*@Singleton
+    @Singleton
     @Provides
-    Application provideApplication() {
-        return (Application) mContext;
-    }*/
+    DBService provideDBService(Realm realm) {
+        return new DBService(realm);
+    }
 }

@@ -1,18 +1,17 @@
 package com.pk.tmdbapp.di.component;
 
-import android.app.Application;
+import android.content.Context;
+import android.content.SharedPreferences;
 
-import com.pk.tmdbapp.MainActivity;
-import com.pk.tmdbapp.activities.DetailActivity;
-import com.pk.tmdbapp.activities.NoInternetActivity;
-import com.pk.tmdbapp.activities.SettingsActivity;
-import com.pk.tmdbapp.application.TMDbApplication;
+import com.pk.tmdbapp.db.DBService;
 import com.pk.tmdbapp.di.module.ApplicationModule;
-import com.pk.tmdbapp.di.scope.PerApplication;
+import com.pk.tmdbapp.mvp.view.activities.SettingsActivity;
 
 import javax.inject.Singleton;
 
 import dagger.Component;
+import io.realm.Realm;
+import retrofit2.Retrofit;
 
 /**
  * Created by ace on 10/04/2017.
@@ -22,9 +21,15 @@ import dagger.Component;
 @Component(modules = ApplicationModule.class)
 public interface ApplicationComponent {
 
-    void inject(TMDbApplication application);
-    void inject(MainActivity mainActivity);
-    void inject(DetailActivity detailActivity);
+    Retrofit exposeRetrofit();
+
+    SharedPreferences exposeSharedPreferences();
+
+    Realm exposeRealm();
+
+    DBService exposeDBService();
+
+    Context exposeContext();
+
     void inject(SettingsActivity settingsActivity);
-    void inject(NoInternetActivity activity);
 }

@@ -1,4 +1,4 @@
-package com.pk.tmdbapp.activities;
+package com.pk.tmdbapp.mvp.view.activities;
 
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
@@ -7,10 +7,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.pk.tmdbapp.MainActivity;
+import com.pk.tmdbapp.mvp.view.main.MainActivity;
 import com.pk.tmdbapp.R;
 import com.pk.tmdbapp.application.TMDbApplication;
-import com.pk.tmdbapp.db.DBService;
 import com.pk.tmdbapp.util.CheckNetwork;
 
 public class NoInternetActivity extends AppCompatActivity {
@@ -19,7 +18,7 @@ public class NoInternetActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_no_internet);
-        ((TMDbApplication) getApplication()).getAppComponent().inject(this);
+        //((TMDbApplication) getApplication()).getAppComponent().inject(this);
 
         final Button button = (Button) findViewById(R.id.try_again);
         button.setOnClickListener(new View.OnClickListener() {
